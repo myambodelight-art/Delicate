@@ -687,6 +687,228 @@
   .tracker-card-head h3{color:#fff;font-size:14px;font-weight:700;}
   .head-gold{width:4px;height:16px;background:var(--gold);border-radius:2px;flex-shrink:0;}
   .tracker-card-body{padding:18px;}
+function unlock() {
+  var val = document.getElementById('lockInput').value;
+  if (val === PASS) {
+    document.getElementById('lockGate').style.display = 'none';
+    document.getElementById('trackerContent').style.display = 'block';
+    sessionStorage.setItem('dc_unlocked', '1');
+    renderOrders(); renderLog(); updateStats();
+    toast('✓ Dashboard unlocked');
+  } else {
+    document.getElementById('lockError').style.display = 'block';
+    document.getElementById('lockInput').value = '';
+    document.getElementById('lockInput').focus();
+  }
+}
+
+function lockDashboard() {
+  sessionStorage.removeItem('dc_unlocked');
+  document.getElementById('trackerContent').style.display = 'none';
+  document.getElementById('lockGate').style.display = 'block';
+  document.getElementById('lockInput').value = '';
+  document.getElementById('lockError').style.display = 'none';
+  toast('🔒 Dashboard locked');
+}
+
+// Auto-unlock if same session
+if (sessionStorage.getItem('dc_unlocked') === '1') {
+  document.getElementById('lockGate').style.display = 'none';
+  document.getElementById('trackerContent').style.display = 'block';
+}
+
+// ===== DATA =====
+var orders = JSON.parse(localStorage.getItem('dc_orders') || '[]');
+var logs = JSON.parse(localStorage.getItem('dc_logs') || '[]');
+var counter = parseInt(localStorage.getItem('dc_counter') || '0');
+var currentFilter = 'all';
+
+function save() {
+  localStorage.setItem('dc_orders', JSON.stringify(orders));
+  localStorage.setItem('dc_logs', JSON.stringify(logs));
+  localStorage.setItem('dc_counter', counter);
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function updateStats() {
+  var active = orders.filter(function(o){ return o.status==='Pending'||o.status==='In Progress'; }).length;
+  var done = orders.filter(function(o){ return o.status==='Done'; }).length;
+  var rev = orders.filter(function(o){ return o.status==='Done'; }).reduce(function(s,o){ return s+(parseFloat(o.amount)||0); }, 0);
+  document.getElementById('tTotal').textContent = orders.length;
+  document.getElementById('tActive').textContent = active;
+  document.getElementById('tDone').textContent = done;
+  document.getElementById('tRev').textContent = '$'+rev.toFixed(0);
+}
+
+function badgeHtml(status) {
+  var map = {'Pending':'badge-pending','In Progress':'badge-progress','Done':'badge-done','Cancelled':'badge-cancelled'};
+  return '<span class="badge '+(map[status]||'")>'+status+'</span>';
+}
+
+function renderOrders() {
+  var tbody = document.getElementById('ordersBody');
+  if (!tbody) return;
+  var list = currentFilter==='all' ? orders : orders.filter(function(o){ return o.status===currentFilter; });
+  if (!list.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">📂 '+(currentFilter==='all'?'No orders yet — log your first order above':'No '+currentFilter.toLowerCase()+' orders')+'</td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(function(o){
+    return '<tr>'+
+      '<td><span class="order-id">#'+o.id+'</span></td>'+
+      '<td><strong style="font-size:13px;">'+o.name+'</strong><div style="font-size:11px;color:var(--text-muted);">'+(o.phone||'')+'</div></td>'+
+      '<td><span class="badge badge-service">'+o.service+'</span></td>'+
+      '<td style="font-size:12px;color:var(--text-muted);">'+(o.uni||'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--text-muted);">'+(o.due||'—')+'</td>'+
+      '<td style="font-weight:700;color:var(--navy);">$'+parseFloat(o.amount||0).toFixed(0)+'</td>'+
+      '<td>'+badgeHtml(o.status)+'</td>'+
+      '<td><div style="display:flex;gap:4px;">'+
+        '<select class="status-sel" onchange="changeStatus(\''+o.id+'\',this.value)">'+
+          '<option value="" disabled selected>▾</option>'+
+          '<option value="Pending">Pending</option>'+
+          '<option value="In Progress">In Progress</option>'+
+          '<option value="Done">Done ✓</option>'+
+          '<option value="Cancelled">Cancel</option>'+
+        '</select>'+
+        '<button class="del-btn" onclick="deleteOrder(\''+o.id+'\')">✕</button>'+
+      '</div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function addOrder() {
+  var name = document.getElementById('fName').value.trim();
+  var service = document.getElementById('fService').value;
+  if (!name||!service){ toast('⚠ Name and service required'); return; }
+  counter++;
+  var id = String(counter).padStart(4,'0');
+  orders.unshift({
+    id:id, name:name,
+    phone:document.getElementById('fPhone').value.trim(),
+    service:service,
+    amount:document.getElementById('fAmount').value||'20',
+    uni:document.getElementById('fUni').value,
+    due:document.getElementById('fDue').value,
+    notes:document.getElementById('fNotes').value.trim(),
+    status:'Pending',
+    created:new Date().toLocaleString()
+  });
+  save(); renderOrders(); updateStats();
+  addLog('Order #'+id+' logged — '+name+' / '+service,'pending');
+  toast('✓ Order #'+id+' logged for '+name);
+  clearForm();
+}
+
+function clearForm() {
+  ['fName','fPhone','fAmount','fNotes'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['fService','fUni'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('fDue').value='';
+}
+
+function changeStatus(id,status) {
+  if (!status) return;
+  var o = orders.find(function(x){ return x.id===id; });
+  if (o){ o.status=status; save(); renderOrders(); updateStats(); toast('#'+id+' → '+status); }
+}
+
+function deleteOrder(id) {
+  if (!confirm('Delete order #'+id+'?')) return;
+  orders = orders.filter(function(o){ return o.id!==id; });
+  save(); renderOrders(); updateStats(); toast('Deleted #'+id);
+}
+
+function filterOrders(f,btn) {
+  currentFilter=f;
+  document.querySelectorAll('.ofilter').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderOrders();
+}
+
+// ===== RESULT LOG =====
+function addLog(msg, type) {
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' ' + now.toLocaleDateString([], {day:'numeric',month:'short'});
+  logs.push({ msg:msg, type:type, time:timeStr });
+  if (logs.length > 100) logs = logs.slice(-100);
+  save();
+  renderLog();
+  toast('✓ Logged: '+msg);
+}
+
+function renderLog() {
+  var feed = document.getElementById('logFeed');
+  if (!feed) return;
+  if (!logs.length) {
+    feed.innerHTML = '<div class="log-empty">No log entries yet.<br>Click a button above to log a result.</div>';
+    return;
+  }
+  var html = '<div class="log-feed">';
+  var recent = logs.slice().reverse().slice(0,20);
+  recent.forEach(function(l){
+    html += '<div class="log-item">'+
+      '<div class="log-dot '+l.type+'"></div>'+
+      '<div class="log-text">'+
+        '<div>'+l.msg+'</div>'+
+        '<div class="log-time">'+l.time+'</div>'+
+      '</div>'+
+    '</div>';
+  });
+  html += '</div>';
+  feed.innerHTML = html;
+}
+
+function clearLog() {
+  if (!confirm('Clear all log entries?')) return;
+  logs = [];
+  save();
+  renderLog();
+  toast('Log cleared');
+}
+
+function copyClientText() {
+  var txt = document.getElementById('copyText').value;
+  if (!txt.trim()){ toast('⚠ Paste text first'); return; }
+  navigator.clipboard.writeText(txt).then(function(){ toast('✓ Copied to clipboard!'); }).catch(function(){
+    document.getElementById('copyText').select();
+    document.execCommand('copy');
+    toast('✓ Copied!');
+  });
+}
+
+// ===== UI =====
+function toggleFaq(el) { el.parentElement.classList.toggle('open'); }
+
+function toggleNav() {
+  var nl = document.getElementById('navLinks');
+  if (nl.style.display === 'flex') {
+    nl.removeAttribute('style');
+  } else {
+    nl.style.cssText = 'display:flex;flex-direction:column;position:absolute;top:62px;left:0;right:0;background:var(--navy);padding:12px 5% 16px;z-index:99;';
+  }
+}
+
+function sendWA() {
+  var name = document.getElementById('cfName').value;
+  var phone = document.getElementById('cfPhone').value;
+  var service = document.getElementById('cfService').value;
+  var msg = document.getElementById('cfMsg').value;
+  var text = 'Hello Delicate & Co!%0A%0AName: '+encodeURIComponent(name)+'%0APhone: '+encodeURIComponent(phone)+'%0AService: '+encodeURIComponent(service||'Not specified')+'%0AMessage: '+encodeURIComponent(msg);
+  window.open('https://wa.me/263780197527?text='+text, '_blank');
+}
+
+// Init
+if (sessionStorage.getItem('dc_unlocked')==='1') {
+  renderOrders(); renderLog(); updateStats();
+}
+</script>
+</body>
+</html>
 
 
 </script>
