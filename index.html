@@ -418,12 +418,18 @@
         <p class="testimonial-text">&ldquo;As an undergraduate student I was stressing about my research project but Delicate &amp; Co handled everything so professionally. They checked my similarity, humanized my content and the results were amazing. My lecturer was very impressed. Highly recommend to every BM student!&rdquo;</p>
         <div class="testimonial-author">
           <div class="author-avatar gold-av">P</div>
-          <div>
+          <div>iv class="testimonial-card featured-review reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">&ldquo;As an undergraduate student I was stressing about my research project but Delicate &amp; Co handled everything so professionally. They checked my similarity, humanized my content and the results were amazing. My lecturer was very impressed. Highly recommend to every BM student!&rdquo;</p>
+        <div class="testimonial-author">Working on my undergraduate research project was stressful, but Delicate & Co made the entire process smooth and hassle-free. Their team professionally handled the similarity check and enhanced my content to make it more natural and engaging. The outcome exceeded my expectations, and my lecturer was extremely impressed. I highly recommend Delicate & Co to all BM students looking for reliable academic support.
+          <div class="author-avatar gold-av">P</div>
+            
+
             <div class="author-name">Precious</div>
             <div class="author-degree">Bachelor of Management Student</div>
             <span class="verified-badge">&#10003; Verified Client</span>
-          </div>
-        </div>
+          </div>div class="author-name">Lameck</div>
+        </div>div class="author-degree">Bachelor of Tourism student</div>
       </div>
 
     </div>
@@ -650,6 +656,39 @@
     const msg = encodeURIComponent('Hello Delicate & Co!\n\nName: ' + name + '\nPhone: ' + phone + '\nService: ' + service + '\nDetails: ' + details + '\n\nPlease assist me.');
     window.open('https://wa.me/263780197527?text=' + msg, '_blank');
   }
+  /* LOCK GATE */
+  .lock-gate{background:var(--bg);padding:60px 5%;text-align:center;}
+  .lock-box{max-width:380px;margin:0 auto;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);padding:36px 32px;}
+  .lock-icon{font-size:40px;margin-bottom:14px;}
+  .lock-box h2{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+  .lock-box p{font-size:13px;color:var(--text-muted);margin-bottom:20px;}
+  .lock-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:11px 14px;font-size:15px;font-family:inherit;outline:none;text-align:center;letter-spacing:4px;color:var(--navy);transition:border-color .15s;}
+  .lock-input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,42,74,.07);}
+  .lock-btn{width:100%;margin-top:12px;background:var(--navy);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s;}
+  .lock-btn:hover{background:var(--navy-light);}
+  .lock-error{color:var(--red);font-size:12px;margin-top:8px;display:none;}
+  .lock-hint{font-size:11px;color:var(--text-muted);margin-top:10px;}
+
+  /* TRACKER */
+  .tracker-section{background:var(--bg);padding:60px 5%;}
+  .section-eyebrow{text-align:center;font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .section-title{text-align:center;font-size:clamp(22px,3.5vw,32px);font-weight:800;color:var(--navy);margin-bottom:8px;}
+  .section-sub{text-align:center;color:var(--text-muted);max-width:520px;margin:0 auto 36px;font-size:15px;}
+
+  .tracker-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:1100px;margin:0 auto 20px;}
+  .tstat{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 12px;text-align:center;box-shadow:var(--shadow);}
+  .tstat-num{font-size:28px;font-weight:800;color:var(--navy);line-height:1;}
+  .tstat-num.gold{color:var(--gold);}
+  .tstat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-top:4px;}
+
+  .tracker-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;max-width:1100px;margin:0 auto;}
+  .tracker-card{background:#fff;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+  .tracker-card-head{background:var(--navy);padding:14px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .tracker-card-head h3{color:#fff;font-size:14px;font-weight:700;}
+  .head-gold{width:4px;height:16px;background:var(--gold);border-radius:2px;flex-shrink:0;}
+  .tracker-card-body{padding:18px;}
+
+
 </script>
 </body>
 </html>
