@@ -1,351 +1,655 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delicate | Professional Document Analysis & Academic Refinement</title>
-    <!-- Tailwind CSS for high-end modern layout controls -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons for crisp, clean vector iconography -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0d1117;
-        }
-        .glass-panel {
-            background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(240, 246, 252, 0.1);
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Delicate & Co Pvt Ltd – Academic Excellence Services</title>
+<!-- Speed: preconnect before font load -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"></noscript>
+<style>
+  :root {
+    --navy: #0b1d3a;
+    --navy-mid: #122347;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-pale: #f9f0d8;
+    --cream: #fdfaf4;
+    --white: #ffffff;
+    --text-dark: #0b1d3a;
+    --text-mid: #3a4a65;
+    --text-light: #7a8aaa;
+    --radius: 16px;
+    --shadow: 0 8px 40px rgba(11,29,58,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', system-ui, sans-serif; background: var(--cream); color: var(--text-dark); overflow-x: hidden; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 6%; background: rgba(11,29,58,0.97); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(201,168,76,0.25); }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-icon { width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: var(--navy); font-family: 'Playfair Display', serif; box-shadow: 0 4px 16px rgba(201,168,76,0.4); flex-shrink: 0; }
+  .logo-text { display: flex; flex-direction: column; }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 17px; color: var(--white); font-weight: 700; line-height: 1.1; }
+  .logo-tagline { font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-cta { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 10px 22px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; transition: transform .2s, box-shadow .2s; box-shadow: 0 4px 16px rgba(201,168,76,0.35); }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,168,76,0.45); }
+
+  /* HERO */
+  .hero { min-height: 100vh; background: var(--navy); display: flex; align-items: center; padding: 120px 6% 80px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -200px; right: -200px; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%); pointer-events: none; }
+  .hero::after { content: ''; position: absolute; bottom: -100px; left: -100px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%); pointer-events: none; }
+  .hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
+  .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3); color: var(--gold); padding: 8px 16px; border-radius: 100px; font-size: 12px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 28px; animation: fadeUp .6s ease both; }
+  .hero-badge span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+  h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 62px); line-height: 1.08; color: var(--white); font-weight: 900; margin-bottom: 12px; animation: fadeUp .7s .1s ease both; }
+  h1 em { font-style: normal; color: var(--gold); }
+  .hero-subtitle { font-size: 18px; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 40px; font-weight: 300; animation: fadeUp .7s .2s ease both; }
+  .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; animation: fadeUp .7s .3s ease both; }
+  .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 16px 32px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; box-shadow: 0 8px 28px rgba(201,168,76,0.4); transition: transform .2s, box-shadow .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(201,168,76,0.5); }
+  .btn-outline { border: 2px solid rgba(255,255,255,0.2); color: var(--white); padding: 14px 30px; border-radius: 10px; font-weight: 600; font-size: 15px; text-decoration: none; transition: border-color .2s, background .2s; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-outline:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .hero-trust { display: flex; gap: 32px; margin-top: 48px; flex-wrap: wrap; animation: fadeUp .7s .4s ease both; }
+  .trust-item { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.6); font-size: 13px; }
+  .trust-item .check { color: var(--gold); font-size: 16px; }
+  .hero-card { background: linear-gradient(145deg, #122347, #0d1e3a); border: 1px solid rgba(201,168,76,0.2); border-radius: 24px; padding: 40px; box-shadow: 0 24px 80px rgba(0,0,0,0.4); animation: fadeUp .8s .2s ease both; }
+  .hero-card-title { color: var(--gold); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 24px; }
+  .pricing-item { margin-bottom: 28px; }
+  .pricing-label { color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+  .pricing-amount { font-family: 'Playfair Display', serif; font-size: 52px; color: var(--gold-light); font-weight: 900; line-height: 1; }
+  .pricing-unit { color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 400; }
+  .pricing-divider { height: 1px; background: rgba(201,168,76,0.15); margin: 20px 0; }
+  .turnaround-badge { display: flex; align-items: center; gap: 12px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); border-radius: 12px; padding: 14px 18px; margin-top: 20px; }
+  .turnaround-badge .icon { font-size: 24px; }
+  .turnaround-badge .label { color: var(--white); font-weight: 600; font-size: 14px; }
+  .turnaround-badge .sub { color: var(--gold); font-size: 12px; }
+  .confidential-badge { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; color: rgba(255,255,255,0.4); font-size: 12px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  /* SECTION COMMONS */
+  section { padding: 100px 6%; }
+  .section-inner { max-width: 1200px; margin: 0 auto; }
+  .section-label { color: var(--gold); font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; margin-bottom: 14px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 46px); color: var(--text-dark); font-weight: 900; line-height: 1.15; margin-bottom: 18px; }
+  .section-title span { color: var(--gold); }
+  .section-subtitle { font-size: 16px; color: var(--text-mid); line-height: 1.75; max-width: 600px; font-weight: 300; }
+
+  /* SERVICES */
+  .services-bg { background: var(--white); }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; margin-top: 60px; }
+  .service-card { background: var(--cream); border: 1px solid rgba(201,168,76,0.15); border-radius: var(--radius); padding: 36px 32px; transition: transform .3s, box-shadow .3s, border-color .3s; position: relative; overflow: hidden; }
+  .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transform: scaleX(0); transform-origin: left; transition: transform .3s; }
+  .service-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: rgba(201,168,76,0.3); }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-icon { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, var(--navy), var(--navy-mid)); display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 22px; box-shadow: 0 6px 20px rgba(11,29,58,0.2); }
+  .service-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
+  .service-desc { font-size: 14px; color: var(--text-mid); line-height: 1.75; margin-bottom: 20px; font-weight: 300; }
+  .service-features { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .service-features li { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-mid); font-weight: 400; }
+  .service-features li::before { content: '✦'; color: var(--gold); font-size: 10px; margin-top: 3px; flex-shrink: 0; }
+
+  /* WHY US */
+  .why-bg { background: var(--navy); }
+  .why-bg .section-title { color: var(--white); }
+  .why-bg .section-subtitle { color: rgba(255,255,255,0.6); }
+  .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-top: 60px; }
+  .why-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.15); border-radius: var(--radius); padding: 32px 28px; text-align: center; transition: background .3s, transform .3s; }
+  .why-card:hover { background: rgba(201,168,76,0.08); transform: translateY(-4px); }
+  .why-num { font-family: 'Playfair Display', serif; font-size: 40px; color: var(--gold); font-weight: 900; margin-bottom: 6px; }
+  .why-label { color: var(--white); font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+  .why-sub { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.6; }
+
+  /* TESTIMONIALS */
+  .testimonials-bg { background: var(--cream); }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
+  .testimonial-card { background: var(--white); border: 1px solid rgba(201,168,76,0.12); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 20px rgba(11,29,58,0.06); transition: transform .3s, box-shadow .3s; }
+  .testimonial-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+  .testimonial-card.featured-review { border-color: rgba(201,168,76,0.4); box-shadow: 0 4px 24px rgba(201,168,76,0.12); }
+  .stars { color: var(--gold); font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+  .testimonial-text { font-size: 14px; color: var(--text-mid); line-height: 1.8; font-style: italic; margin-bottom: 20px; font-weight: 300; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--navy), var(--navy-mid)); display: flex; align-items: center; justify-content: center; color: var(--gold); font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .author-avatar.gold-av { background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); }
+  .author-name { font-weight: 600; font-size: 14px; color: var(--text-dark); }
+  .author-degree { font-size: 12px; color: var(--text-light); }
+  .verified-badge { display: inline-block; background: #e8f7ef; color: #1a7a4a; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-top: 3px; }
+
+  /* FAQ */
+  .faq-bg { background: var(--white); }
+  .faq-list { margin-top: 60px; max-width: 760px; display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { border: 1px solid rgba(201,168,76,0.15); border-radius: 12px; overflow: hidden; transition: border-color .2s; }
+  .faq-item:hover { border-color: rgba(201,168,76,0.35); }
+  .faq-q { width: 100%; background: none; border: none; cursor: pointer; padding: 22px 28px; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 16px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-dark); }
+  .faq-arrow { color: var(--gold); font-size: 18px; transition: transform .3s; flex-shrink: 0; }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s; }
+  .faq-a p { padding: 0 28px 22px; font-size: 14px; color: var(--text-mid); line-height: 1.8; font-weight: 300; }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+  .faq-item.open .faq-a { max-height: 200px; }
+
+  /* PRICING */
+  .pricing-bg { background: var(--navy); }
+  .pricing-bg .section-title { color: var(--white); }
+  .pricing-bg .section-subtitle { color: rgba(255,255,255,0.6); }
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; }
+  .price-card { border-radius: 20px; padding: 40px 32px; border: 1px solid rgba(201,168,76,0.2); background: rgba(255,255,255,0.04); text-align: center; position: relative; overflow: hidden; transition: transform .3s, background .3s; }
+  .price-card.featured { background: linear-gradient(145deg, #c9a84c22, #c9a84c08); border-color: rgba(201,168,76,0.5); transform: scale(1.04); }
+  .price-card:hover { transform: translateY(-6px) scale(1.01); }
+  .price-card.featured:hover { transform: translateY(-6px) scale(1.05); }
+  .price-tag { display: inline-block; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 100px; margin-bottom: 20px; }
+  .price-name { color: var(--white); font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .price-amount { font-family: 'Playfair Display', serif; font-size: 64px; color: var(--gold-light); font-weight: 900; line-height: 1; }
+  .price-period { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 28px; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 32px; }
+  .price-features li { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); font-size: 14px; }
+  .price-features li::before { content: '✓'; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+  .price-btn { display: block; width: 100%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: var(--navy); padding: 14px; border-radius: 10px; font-weight: 700; font-size: 15px; text-decoration: none; text-align: center; transition: transform .2s, box-shadow .2s; box-shadow: 0 6px 20px rgba(201,168,76,0.3); }
+  .price-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(201,168,76,0.4); }
+  .price-btn.outline { background: transparent; border: 2px solid rgba(201,168,76,0.4); color: var(--gold); box-shadow: none; }
+  .price-btn.outline:hover { background: rgba(201,168,76,0.08); }
+
+  /* CONTACT */
+  .contact-bg { background: var(--cream); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; margin-top: 60px; align-items: start; }
+  .contact-info { display: flex; flex-direction: column; gap: 24px; }
+  .contact-item { display: flex; align-items: center; gap: 18px; background: var(--white); border: 1px solid rgba(201,168,76,0.15); border-radius: 14px; padding: 20px 24px; transition: box-shadow .2s, border-color .2s; text-decoration: none; }
+  .contact-item:hover { box-shadow: var(--shadow); border-color: rgba(201,168,76,0.3); }
+  .contact-icon { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #25d366, #128c7e); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .contact-num { font-weight: 600; font-size: 16px; color: var(--text-dark); }
+  .contact-label { font-size: 12px; color: var(--text-light); }
+  .contact-form-wrapper { background: var(--white); border: 1px solid rgba(201,168,76,0.15); border-radius: 20px; padding: 40px; box-shadow: var(--shadow); }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--text-dark); margin-bottom: 28px; font-weight: 700; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dark); margin-bottom: 8px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 14px 16px; border: 1px solid rgba(11,29,58,0.12); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-dark); background: var(--cream); outline: none; transition: border-color .2s, box-shadow .2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.12); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .form-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--navy), var(--navy-mid)); color: var(--white); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; transition: transform .2s, box-shadow .2s; box-shadow: 0 6px 24px rgba(11,29,58,0.25); }
+  .form-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(11,29,58,0.35); }
+
+  /* FOOTER */
+  footer { background: var(--navy); border-top: 1px solid rgba(201,168,76,0.15); padding: 48px 6% 32px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; }
+  .footer-top { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 32px; margin-bottom: 40px; }
+  .footer-badges { display: flex; gap: 32px; flex-wrap: wrap; }
+  .footer-badge { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .footer-badge .fb-icon { font-size: 24px; color: var(--gold); }
+  .footer-badge .fb-label { font-size: 12px; font-weight: 600; color: var(--white); }
+  .footer-badge .fb-sub { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; }
+  .footer-divider { height: 1px; background: rgba(201,168,76,0.12); margin-bottom: 24px; }
+  .footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .footer-copy { color: rgba(255,255,255,0.4); font-size: 13px; }
+  .footer-trusted { color: rgba(255,255,255,0.5); font-size: 13px; }
+  .footer-trusted span { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+    .hero-card { max-width: 420px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links { display: none; }
+    .price-card.featured { transform: scale(1); }
+  }
+  @media (max-width: 600px) {
+    nav { padding: 14px 5%; }
+    section { padding: 70px 5%; }
+    .hero { padding: 100px 5% 60px; }
+  }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
 </head>
-<body class="text-[#c9d1d9] min-h-screen flex flex-col justify-between selection:bg-indigo-600 selection:text-white">
+<body>
 
-    <!-- Top Navigation Header -->
-    <header class="fixed top-0 left-0 w-full z-40 bg-[#161b22]/90 backdrop-blur border-b border-[#30363d]">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="p-2 bg-indigo-600/10 rounded-xl border border-indigo-500/20 text-indigo-400">
-                    <i data-lucide="layers" class="w-6 h-6"></i>
-                </div>
-                <span class="text-xl font-extrabold tracking-tight text-white">DELICATE</span>
-            </div>
-            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-[#8b949e]">
-                <a href="#services" class="hover:text-white transition">Services</a>
-                <a href="#about" class="hover:text-white transition">Quality Metrics</a>
-                <a href="#tracker" class="hover:text-white transition">Track Submission</a>
-            </nav>
-            <div>
-                <button onclick="openModal('loginModal')" class="text-xs font-medium text-[#8b949e] hover:text-indigo-400 transition flex items-center gap-1.5 bg-[#0d1117] px-3 py-1.5 rounded-lg border border-[#30363d]">
-                    <i data-lucide="lock" class="w-3.5 h-3.5"></i> Control Console
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Stream -->
-    <main class="pt-32 flex-grow">
-        
-        <!-- Premium Hero & Client Tracking Input Box -->
-        <section class="max-w-4xl mx-auto px-6 text-center mb-20">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6">
-                <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span> Academic Integrity & Optimization Systems
-            </div>
-            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-6 leading-tight">
-                High-Tier Document Analysis & <br><span class="text-indigo-400">Structural Text Optimization</span>
-            </h1>
-            <p class="text-[#8b949e] text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-                Professional similarity report adjustment, algorithmic phrase optimization, and rigorous structural analysis engineered to meet peak university metrics.
-            </p>
-
-            <!-- Interactive Search Field -->
-            <div id="tracker" class="max-w-md mx-auto p-2 rounded-xl bg-[#161b22] border border-[#30363d] shadow-xl flex items-center gap-2">
-                <div class="flex items-center gap-2 pl-3 text-[#8b949e] flex-grow">
-                    <i data-lucide="search" class="w-4 h-4 text-indigo-400"></i>
-                    <input type="text" id="clientOrderId" placeholder="Enter Order Tracking ID..." class="bg-transparent text-sm text-white focus:outline-none w-full placeholder-[#484f58]">
-                </div>
-                <button onclick="checkClientOrder()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-lg transition duration-200 shadow-md flex items-center gap-2 shrink-0">
-                    Track Project
-                </button>
-            </div>
-            
-            <!-- Target Injected Output UI Window Box -->
-            <div id="clientResultBox" class="max-w-md mx-auto mt-4 hidden p-4 rounded-xl text-left border">
-                <!-- Data Displayed Instantly Via Script -->
-            </div>
-        </section>
-
-        <!-- Structured Corporate Core Services Matrix Section -->
-        <section id="services" class="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-6 mb-24">
-            <div class="p-6 rounded-xl bg-[#161b22] border border-[#30363d] hover:border-indigo-500/40 transition duration-200">
-                <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-5">
-                    <i data-lucide="file-check" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-base font-bold text-white mb-2">Similarity Reports & Humanization</h3>
-                <p class="text-[#8b949e] text-xs leading-relaxed">Meticulous paragraph-level optimization designed to cleanly reduce similarity scores beneath strict institution margins while upholding original scholarly prose.</p>
-            </div>
-            <div class="p-6 rounded-xl bg-[#161b22] border border-[#30363d] hover:border-indigo-500/40 transition duration-200">
-                <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-5">
-                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-base font-bold text-white mb-2">Empirical Analytics & Financial Models</h3>
-                <p class="text-[#8b949e] text-xs leading-relaxed">Advanced structural reviews detailing capital architectures, comprehensive cost structures, and corporate performance dynamics with extreme numeric transparency.</p>
-            </div>
-            <div class="p-6 rounded-xl bg-[#161b22] border border-[#30363d] hover:border-indigo-500/40 transition duration-200">
-                <div class="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 mb-5">
-                    <i data-lucide="git-merge" class="w-5 h-5"></i>
-                </div>
-                <h3 class="text-base font-bold text-white mb-2">Consolidated System Mapping</h3>
-                <p class="text-[#8b949e] text-xs leading-relaxed">Granular evaluation worksheets configured explicitly to support multi-tiered equity distributions, group adjustments, and systemic auditing models.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer Segment -->
-    <footer class="border-t border-[#30363d] bg-[#161b22]/40 py-6 text-center text-xs text-[#8b949e]">
-        <p>&copy; 2026 Delicate Systems. Secure Document Verification Architecture.</p>
-    </footer>
-
-    <!-- ================= AUTHENTICATED SYSTEM PORTALS ================= -->
-
-    <!-- Password Verification Popup Screen -->
-    <div id="loginModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-[#161b22] border border-[#30363d] w-full max-w-sm rounded-xl p-6 relative shadow-2xl">
-            <button onclick="closeModal('loginModal')" class="absolute top-4 right-4 text-[#8b949e] hover:text-white">
-                <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-            <h3 class="text-base font-bold text-white mb-1 flex items-center gap-2">
-                <i data-lucide="shield-alert" class="text-indigo-400 w-4 h-4"></i> Identity Validation Required
-            </h3>
-            <p class="text-xs text-[#8b949e] mb-4">Please input your secure passkey to launch the data management terminal.</p>
-            <input type="password" id="adminPassword" placeholder="Passkey Signature Required..." class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 mb-4">
-            <button onclick="verifyAdminPassword()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2.5 rounded-lg transition duration-150">
-                Verify Identity
-            </button>
-        </div>
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-icon">D&amp;</div>
+    <div class="logo-text">
+      <span class="logo-name">Delicate &amp; Co</span>
+      <span class="logo-tagline">Pvt Ltd</span>
     </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Get Started &rarr;</a>
+</nav>
 
-    <!-- Protected Management Console Workspace Overlay Panel -->
-    <div id="adminPanel" class="fixed inset-0 bg-[#0d1117] z-50 hidden overflow-y-auto p-6 md:p-12">
-        <div class="max-w-5xl mx-auto">
-            <div class="flex items-center justify-between border-b border-[#30363d] pb-6 mb-8">
-                <div>
-                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
-                        <span class="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded text-xs font-mono">SECURE</span>
-                        Delicate Central Document Manifest Console
-                    </h2>
-                    <p class="text-xs text-[#8b949e] mt-1">Configure client parameters, project target matrices, and deadlines.</p>
-                </div>
-                <button onclick="logoutAdmin()" class="bg-[#161b22] border border-[#30363d] text-[#8b949e] hover:text-white px-3 py-2 rounded-lg text-xs font-medium transition duration-150 flex items-center gap-1.5">
-                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Terminate Session
-                </button>
-            </div>
-
-            <!-- New Entry Record Ingestion Engine Form Card -->
-            <div class="bg-[#161b22] border border-[#30363d] rounded-xl p-5 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-                <div>
-                    <label class="block text-xs font-semibold text-[#8b949e] mb-1.5">Order Assignment ID</label>
-                    <input type="text" id="newOrderId" placeholder="e.g. DEL-201" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-[#8b949e] mb-1.5">Assigned University Matrix</label>
-                    <input type="text" id="newUniversity" placeholder="e.g. Midlands State University" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-[#8b949e] mb-1.5">Due Date Parameters</label>
-                    <input type="date" id="newDueDate" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-[#8b949e] mb-1.5">Execution Milestones</label>
-                    <select id="newStatus" class="w-full bg-[#0d1117] border border-[#30363d] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-                        <option value="In Progress">In Progress</option>
-                        <option value="Under Review">Under Review</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <button onclick="addOrderRecord()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2.5 rounded-lg transition duration-150 shadow-md flex items-center justify-center gap-1">
-                    <i data-lucide="plus" class="w-3.5 h-3.5"></i> Deploy Manifest
-                </button>
-            </div>
-
-            <!-- Ingestion Matrix Output Core Table Component -->
-            <div class="bg-[#161b22] border border-[#30363d] rounded-xl overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="border-b border-[#30363d] bg-[#161b22] text-xs font-bold text-[#8b949e]">
-                                <th class="p-4">Order Ref ID</th>
-                                <th class="p-4">University Institution</th>
-                                <th class="p-4">Target Due Date</th>
-                                <th class="p-4">Workflow Status</th>
-                                <th class="p-4 text-right">Data Operations</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminTableBody" class="text-xs divide-y divide-[#30363d] text-[#c9d1d9]">
-                            <!-- Row Content Managed Invariant Stream -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge"><span></span> Student Academic Services</div>
+      <h1>Academic <em>Excellence</em><br>Delivered with<br>Confidence</h1>
+      <p class="hero-subtitle">Professional plagiarism checking, AI humanizing, dissertation writing, data collection &amp; IBM SPSS statistical analysis &mdash; helping students submit with confidence.</p>
+      <div class="hero-actions">
+        <a href="#contact" class="btn-primary">&#128233; Get Your Report &rarr;</a>
+        <a href="#services" class="btn-outline">View Services</a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-item"><span class="check">&#10003;</span> 100% Confidential</div>
+        <div class="trust-item"><span class="check">&#10003;</span> 24-Hour Turnaround</div>
+        <div class="trust-item"><span class="check">&#10003;</span> Trusted by Students</div>
+      </div>
     </div>
+    <div>
+      <div class="hero-card">
+        <div class="hero-card-title">Student Friendly Pricing</div>
+        <div class="pricing-item">
+          <div class="pricing-label">All Services</div>
+          <div class="pricing-amount">$20 <span class="pricing-unit">/ per report</span></div>
+        </div>
+        <div class="pricing-divider"></div>
+        <div class="pricing-item">
+          <div class="pricing-label">Dissertation Writing</div>
+          <div class="pricing-amount">$20 <span class="pricing-unit">/ per chapter</span></div>
+        </div>
+        <div class="turnaround-badge">
+          <div class="icon">&#9201;</div>
+          <div>
+            <div class="label">24-Hour Turnaround</div>
+            <div class="sub">Available on all orders</div>
+          </div>
+        </div>
+        <div class="confidential-badge">&#128274; 100% Confidential &amp; Secure</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Underlying System Operational Logic Engine Pipeline -->
-    <script>
-        // Seed database objects safely inside system context memory variables
-        if (!localStorage.getItem('delicate_orders')) {
-            const defaultSeedingContext = [
-                { id: 'DEL-101', university: 'Midlands State University', dueDate: '2026-07-10', status: 'In Progress' }
-            ];
-            localStorage.setItem('delicate_orders', JSON.stringify(defaultSeedingContext));
-        }
+<!-- SERVICES -->
+<section class="services-bg" id="services">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">What We Offer</div>
+      <h2 class="section-title">Our <span>Academic</span> Services</h2>
+      <p class="section-subtitle">Comprehensive support for every stage of your academic journey &mdash; from checking originality to writing entire dissertation chapters.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">&#128196;</div>
+        <div class="service-name">Plagiarism Check &amp; Paraphrasing</div>
+        <p class="service-desc">Detailed similarity reports with percentage breakdown, source identification, and professionally paraphrased content.</p>
+        <ul class="service-features">
+          <li>Full similarity percentage report</li>
+          <li>Source-by-source breakdown</li>
+          <li>Professional paraphrasing included</li>
+          <li>Turnitin &amp; iThenticate compatible</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">&#129302;</div>
+        <div class="service-name">AI Content Detection &amp; Humanizing</div>
+        <p class="service-desc">Identify AI-generated content and transform it into natural, authentic, human-like writing that passes all detectors.</p>
+        <ul class="service-features">
+          <li>AI detection report provided</li>
+          <li>Full humanization of flagged text</li>
+          <li>Maintains original meaning &amp; structure</li>
+          <li>GPTZero &amp; Originality.ai ready</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">&#128218;</div>
+        <div class="service-name">Dissertation Writing (Chapters 3&ndash;5)</div>
+        <p class="service-desc">Expert academic writing covering Research Methodology, Data Analysis, Conclusions &amp; Recommendations.</p>
+        <ul class="service-features">
+          <li>Chapter 3 &ndash; Research Methodology</li>
+          <li>Chapter 4 &ndash; Data Presentation &amp; Analysis</li>
+          <li>Chapter 5 &ndash; Conclusions &amp; Recommendations</li>
+          <li>Proper referencing &amp; formatting</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">&#128202;</div>
+        <div class="service-name">IBM SPSS Statistical Analysis</div>
+        <p class="service-desc">Professional quantitative data analysis using IBM SPSS with interpretation, tables, charts, and full reporting.</p>
+        <ul class="service-features">
+          <li>Data entry &amp; cleaning</li>
+          <li>Descriptive &amp; inferential statistics</li>
+          <li>Charts, tables &amp; interpretation</li>
+          <li>Results write-up included</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">&#128193;</div>
+        <div class="service-name">Data Collection Assistance</div>
+        <p class="service-desc">Structured data collection support including survey design, questionnaire development, and raw data compilation.</p>
+        <ul class="service-features">
+          <li>Questionnaire &amp; survey design</li>
+          <li>Primary &amp; secondary data support</li>
+          <li>Data organization &amp; structuring</li>
+          <li>Ready for analysis delivery</li>
+        </ul>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">&#9999;&#65039;</div>
+        <div class="service-name">Academic Editing &amp; Proofreading</div>
+        <p class="service-desc">Comprehensive academic editing covering grammar, structure, referencing styles, and overall academic tone.</p>
+        <ul class="service-features">
+          <li>Grammar &amp; language correction</li>
+          <li>APA, Harvard, MLA referencing</li>
+          <li>Structure &amp; flow improvement</li>
+          <li>Academic tone enhancement</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // Framework Window Control Triggers
-        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+<!-- WHY US -->
+<section class="why-bg" id="why">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label" style="color:var(--gold)">Why Choose Us</div>
+      <h2 class="section-title">Trusted by <span>Hundreds</span> of Students</h2>
+      <p class="section-subtitle">From undergraduate to PhD level, we&rsquo;ve helped students across Zimbabwe and beyond submit with confidence.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-num">500+</div><div class="why-label">Reports Delivered</div><div class="why-sub">Plagiarism &amp; AI reports successfully completed</div></div>
+      <div class="why-card reveal"><div class="why-num">24hr</div><div class="why-label">Fast Turnaround</div><div class="why-sub">Most orders completed within 24 hours</div></div>
+      <div class="why-card reveal"><div class="why-num">100%</div><div class="why-label">Confidential</div><div class="why-sub">Your privacy is fully protected at all times</div></div>
+      <div class="why-card reveal"><div class="why-num">4.9&#9733;</div><div class="why-label">Client Rating</div><div class="why-sub">Consistently rated excellent by our clients</div></div>
+    </div>
+  </div>
+</section>
 
-        // Core Gate Security Validation Routine
-        function verifyAdminPassword() {
-            const passBuffer = document.getElementById('adminPassword').value;
-            if (passBuffer === 'Dean @2803') {
-                closeModal('loginModal');
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.getElementById('adminPassword').value = ''; // Safely clear state
-                renderAdminTable();
-            } else {
-                alert('Access Revoked: Credentials Signature Check Failed.');
-            }
-        }
+<!-- TESTIMONIALS -->
+<section class="testimonials-bg" id="testimonials">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Student Reviews</div>
+      <h2 class="section-title">What Our <span>Clients</span> Say</h2>
+      <p class="section-subtitle">Real feedback from students we&rsquo;ve helped achieve academic success.</p>
+    </div>
+    <div class="testimonials-grid">
 
-        function logoutAdmin() {
-            document.getElementById('adminPanel').classList.add('hidden');
-        }
+      <div class="testimonial-card reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">&ldquo;Delicate &amp; Co saved my dissertation. My plagiarism was at 34% and they brought it down to under 5% in less than 12 hours. Absolutely professional service.&rdquo;</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">TM</div>
+          <div>
+            <div class="author-name">Tendai M.</div>
+            <div class="author-degree">Masters Student, UZ</div>
+          </div>
+        </div>
+      </div>
 
-        function getManifestRecords() {
-            return JSON.parse(localStorage.getItem('delicate_orders')) || [];
-        }
+      <div class="testimonial-card reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">&ldquo;I was worried about AI detection in my assignment. They humanized the entire document and provided a full report. The quality was outstanding and very affordable.&rdquo;</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">FK</div>
+          <div>
+            <div class="author-name">Faith K.</div>
+            <div class="author-degree">Honours Student, NUST</div>
+          </div>
+        </div>
+      </div>
 
-        // Refresh Interface Views
-        function renderAdminTable() {
-            const dataset = getManifestRecords();
-            const tableBody = document.getElementById('adminTableBody');
-            tableBody.innerHTML = '';
+      <div class="testimonial-card reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">&ldquo;Chapter 4 and SPSS analysis done perfectly. The tables and interpretation were exactly what my supervisor required. I will definitely use them again for Chapter 5.&rdquo;</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">RN</div>
+          <div>
+            <div class="author-name">Rutendo N.</div>
+            <div class="author-degree">PhD Candidate, MSU</div>
+          </div>
+        </div>
+      </div>
 
-            if (dataset.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-[#8b949e]">No active assignments in tracking ledger.</td></tr>`;
-                return;
-            }
+      <div class="testimonial-card featured-review reveal">
+        <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+        <p class="testimonial-text">&ldquo;As an undergraduate student I was stressing about my research project but Delicate &amp; Co handled everything so professionally. They checked my similarity, humanized my content and the results were amazing. My lecturer was very impressed. Highly recommend to every BM student!&rdquo;</p>
+        <div class="testimonial-author">
+          <div class="author-avatar gold-av">P</div>
+          <div>
+            <div class="author-name">Precious</div>
+            <div class="author-degree">Bachelor of Management Student</div>
+            <span class="verified-badge">&#10003; Verified Client</span>
+          </div>
+        </div>
+      </div>
 
-            dataset.forEach(order => {
-                let statusClasses = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-                if (order.status === 'Completed') statusClasses = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-                if (order.status === 'Under Review') statusClasses = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+    </div>
+  </div>
+</section>
 
-                tableBody.innerHTML += `
-                    <tr class="hover:bg-[#0d1117]/40 transition">
-                        <td class="p-4 font-mono font-bold text-white">${order.id}</td>
-                        <td class="p-4">${order.university}</td>
-                        <td class="p-4">${order.dueDate}</td>
-                        <td class="p-4">
-                            <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${statusClasses}">${order.status}</span>
-                        </td>
-                        <td class="p-4 text-right">
-                            <button onclick="purgeManifestRow('${order.id}')" class="text-red-400 hover:text-red-300 transition bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded border border-red-500/20 font-medium text-[11px]">
-                                Purge
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-            lucide.createIcons();
-        }
+<!-- PRICING -->
+<section class="pricing-bg" id="pricing">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label" style="color:var(--gold)">Simple Pricing</div>
+      <h2 class="section-title">Student <span>Friendly</span> Rates</h2>
+      <p class="section-subtitle">Transparent, affordable pricing with no hidden fees. Quality academic support that fits a student budget.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card reveal">
+        <div class="price-tag">Plagiarism</div>
+        <div class="price-name">Plagiarism Check</div>
+        <div class="price-amount">$20</div>
+        <div class="price-period">per report</div>
+        <ul class="price-features">
+          <li>Full similarity report</li>
+          <li>Percentage breakdown</li>
+          <li>Source identification</li>
+          <li>Professional paraphrasing</li>
+          <li>24-hr turnaround</li>
+        </ul>
+        <a href="#contact" class="price-btn outline">Order Now</a>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="price-tag">Most Popular</div>
+        <div class="price-name">AI Humanizing</div>
+        <div class="price-amount">$20</div>
+        <div class="price-period">per report</div>
+        <ul class="price-features">
+          <li>AI detection report</li>
+          <li>Full humanization</li>
+          <li>Meaning preserved</li>
+          <li>All detectors cleared</li>
+          <li>24-hr turnaround</li>
+        </ul>
+        <a href="#contact" class="price-btn">Order Now</a>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-tag">Dissertation</div>
+        <div class="price-name">Chapter Writing</div>
+        <div class="price-amount">$20</div>
+        <div class="price-period">per chapter</div>
+        <ul class="price-features">
+          <li>Chapters 3, 4, or 5</li>
+          <li>SPSS analysis included</li>
+          <li>Tables &amp; charts</li>
+          <li>Proper referencing</li>
+          <li>Supervisor-ready quality</li>
+        </ul>
+        <a href="#contact" class="price-btn outline">Order Now</a>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-tag">Website</div>
+        <div class="price-name">Website Creation</div>
+        <div class="price-amount">$30</div>
+        <div class="price-period">per website</div>
+        <ul class="price-features">
+          <li>5-page professional website</li>
+          <li>Mobile-responsive design</li>
+          <li>Domain &amp; hosting setup</li>
+          <li>Contact form included</li>
+          <li>Delivered in 5&ndash;7 days</li>
+        </ul>
+        <a href="#contact" class="price-btn outline">Order Now</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-        // Commit New Record Instance
-        function addOrderRecord() {
-            const idVal = document.getElementById('newOrderId').value.trim().toUpperCase();
-            const uniVal = document.getElementById('newUniversity').value.trim();
-            const dateVal = document.getElementById('newDueDate').value;
-            const statusVal = document.getElementById('newStatus').value;
+<!-- FAQ -->
+<section class="faq-bg" id="faq">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Common Questions</div>
+      <h2 class="section-title">Frequently <span>Asked</span> Questions</h2>
+      <p class="section-subtitle">Everything you need to know before placing your order.</p>
+    </div>
+    <div class="faq-list reveal">
+      <div class="faq-item">
+        <button class="faq-q">How long does a plagiarism check take? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>Most plagiarism checks and reports are completed within 2&ndash;6 hours. For urgent orders, a 24-hour turnaround is guaranteed. Larger documents may take slightly longer but we always communicate timelines upfront.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Is my work kept confidential? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>Absolutely. We operate with strict confidentiality. Your documents, personal information, and order details are never shared with any third party. Your privacy is our highest priority.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">What plagiarism tools do you use? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>We use industry-leading tools including Turnitin and iThenticate to provide accurate similarity reports. We can also check against specific institutional requirements upon request.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Can you write all chapters of my dissertation? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>We specialize in Chapters 3 (Methodology), 4 (Data Presentation &amp; Analysis), and 5 (Conclusions &amp; Recommendations). Each chapter is priced at $20 and includes proper referencing, formatting, and SPSS work where needed.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">How do I pay and receive my work? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>Contact us via WhatsApp on any of our numbers. We&rsquo;ll discuss your requirements, agree on the scope, and arrange payment before beginning. Completed work is delivered directly to you on WhatsApp or email.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Do you offer revisions? <span class="faq-arrow">+</span></button>
+        <div class="faq-a"><p>Yes. We offer free revisions if the delivered work does not meet the agreed requirements. Our goal is your complete satisfaction and we work with you until you&rsquo;re happy with the result.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            if (!idVal || !uniVal || !dateVal) {
-                alert('Invalid Operation: Complete all metadata parameters.');
-                return;
-            }
+<!-- CONTACT -->
+<section class="contact-bg" id="contact">
+  <div class="section-inner">
+    <div class="reveal">
+      <div class="section-label">Get In Touch</div>
+      <h2 class="section-title">Ready to <span>Get Started?</span></h2>
+      <p class="section-subtitle">Reach out on WhatsApp for instant assistance, or fill in the form and we&rsquo;ll get back to you promptly.</p>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="contact-info reveal">
+          <a href="https://wa.me/263780197527" class="contact-item" target="_blank">
+            <div class="contact-icon">&#128172;</div>
+            <div><div class="contact-num">+263 780 197 527</div><div class="contact-label">WhatsApp &mdash; Tap to chat</div></div>
+          </a>
+          <a href="https://wa.me/263788027970" class="contact-item" target="_blank">
+            <div class="contact-icon">&#128172;</div>
+            <div><div class="contact-num">+263 788 027 970</div><div class="contact-label">WhatsApp &mdash; Tap to chat</div></div>
+          </a>
+          <a href="https://wa.me/263774783388" class="contact-item" target="_blank">
+            <div class="contact-icon">&#128172;</div>
+            <div><div class="contact-num">+263 774 783 388</div><div class="contact-label">WhatsApp &mdash; Tap to chat</div></div>
+          </a>
+        </div>
+        <div style="margin-top:32px;padding:24px 28px;background:var(--navy);border-radius:16px;border:1px solid rgba(201,168,76,0.2);" class="reveal">
+          <p style="color:rgba(255,255,255,0.6);font-size:13px;line-height:1.8;font-weight:300;">
+            <strong style="color:var(--gold);display:block;margin-bottom:8px;">&#128205; Serving All Universities in Zimbabwe</strong>
+            UZ &middot; NUST &middot; MSU &middot; ZOU &middot; BUSE &middot; CUT &middot; HIT &middot; WUA and more.<br><br>
+            <strong style="color:var(--gold);display:block;margin-bottom:4px;">&#10003; Trusted by:</strong>
+            Undergraduate &middot; Honours &middot; Masters &middot; PhD Students
+          </p>
+        </div>
+      </div>
+      <div class="contact-form-wrapper reveal">
+        <div class="form-title">Send Us a Message</div>
+        <div class="form-group"><label>Your Name</label><input type="text" placeholder="e.g. Tendai Moyo" /></div>
+        <div class="form-group"><label>WhatsApp / Phone Number</label><input type="tel" placeholder="+263 7XX XXX XXX" /></div>
+        <div class="form-group">
+          <label>Service Required</label>
+          <select>
+            <option value="">Select a service...</option>
+            <option>Plagiarism Check &amp; Paraphrasing</option>
+            <option>AI Content Detection &amp; Humanizing</option>
+            <option>Dissertation Writing (Chapter 3)</option>
+            <option>Dissertation Writing (Chapter 4)</option>
+            <option>Dissertation Writing (Chapter 5)</option>
+            <option>IBM SPSS Statistical Analysis</option>
+            <option>Data Collection Assistance</option>
+            <option>Academic Editing &amp; Proofreading</option>
+            <option>Website Creation &amp; Maintenance</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Additional Details</label><textarea placeholder="Tell us about your document, deadline, word count, etc."></textarea></div>
+        <button class="form-submit" onclick="handleSubmit(this)">Send Message via WhatsApp &rarr;</button>
+      </div>
+    </div>
+  </div>
+</section>
 
-            let database = getManifestRecords();
-            if (database.some(item => item.id === idVal)) {
-                alert('Constraint Conflict: Record ID signature already mapped.');
-                return;
-            }
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <a href="#" class="nav-logo">
+        <div class="logo-icon">D&amp;</div>
+        <div class="logo-text">
+          <span class="logo-name">Delicate &amp; Co</span>
+          <span class="logo-tagline">Pvt Ltd</span>
+        </div>
+      </a>
+      <div class="footer-badges">
+        <div class="footer-badge"><div class="fb-icon">&#128274;</div><div class="fb-label">100% Confidential</div><div class="fb-sub">Your privacy is safe with us</div></div>
+        <div class="footer-badge"><div class="fb-icon">&#9200;</div><div class="fb-label">On-Time Delivery</div><div class="fb-sub">We respect your deadlines</div></div>
+        <div class="footer-badge"><div class="fb-icon">&#127942;</div><div class="fb-label">Quality Guaranteed</div><div class="fb-sub">Original content you can trust</div></div>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; 2026 Delicate &amp; Co Pvt Ltd. All rights reserved.</div>
+      <div class="footer-trusted">Trusted by <span>Undergraduate, Honours, Masters &amp; PhD</span> Students</div>
+    </div>
+  </div>
+</footer>
 
-            database.push({ id: idVal, university: uniVal, dueDate: dateVal, status: statusVal });
-            localStorage.setItem('delicate_orders', JSON.stringify(database));
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(r => observer.observe(r));
 
-            // Flush parameters
-            document.getElementById('newOrderId').value = '';
-            document.getElementById('newUniversity').value = '';
-            document.getElementById('newDueDate').value = '';
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
 
-            renderAdminTable();
-        }
-
-        // Drop Manifest Row
-        function purgeManifestRow(targetId) {
-            if (confirm(`Confirm destruction of manifest record parameters for: ${targetId}?`)) {
-                let dataset = getManifestRecords().filter(item => item.id !== targetId);
-                localStorage.setItem('delicate_orders', JSON.stringify(dataset));
-                renderAdminTable();
-            }
-        }
-
-        // Client Context Query Parser Engine
-        function checkClientOrder() {
-            const lookupId = document.getElementById('clientOrderId').value.trim().toUpperCase();
-            const outputBox = document.getElementById('clientResultBox');
-
-            if (!lookupId) {
-                alert('Action Required: Supply a unique transaction Order ID.');
-                return;
-            }
-
-            const database = getManifestRecords();
-            const record = database.find(item => item.id === lookupId);
-
-            outputBox.classList.remove('hidden');
-            if (record) {
-                let statusClasses = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-                if (record.status === 'Completed') statusClasses = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-                if (record.status === 'Under Review') statusClasses = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
-
-                outputBox.className = "max-w-md mx-auto mt-6 p-4 rounded-xl border bg-[#161b22] border-[#30363d] text-left text-xs shadow-xl animate-fade-in";
-                outputBox.innerHTML = `
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] uppercase font-mono tracking-wider text-[#8b949e]">Analysis Tracking Log</span>
-                        <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${statusClasses}">${record.status}</span>
-                    </div>
-                    <div class="text-base font-extrabold text-white mb-2 font-mono">${record.id}</div>
-                    <div class="space-y-1.5 border-t border-[#30363d] pt-2.5 text-[#8b949e]">
-                        <div class="flex justify-between"><span>Institution Matrix:</span> <span class="text-white font-medium">${record.university}</span></div>
-                        <div class="flex justify-between"><span>Timeline Target Date:</span> <span class="text-white font-medium">${record.dueDate}</span></div>
-                    </div>
-                `;
-            } else {
-                outputBox.className = "max-w-md mx-auto mt-6 p-4 rounded-xl border bg-red-500/5 text-left text-xs border-red-500/20 text-red-400";
-                outputBox.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="info" class="w-4 h-4 shrink-0"></i> Signature Mismatch: Manifest matching search keys not found. Verify parameters and retry.
-                    </div>
-                `;
-            }
-            lucide.createIcons();
-        }
-
-        // Initialize Vector UI Icons
-        lucide.createIcons();
-    </script>
+  function handleSubmit(btn) {
+    const inputs = document.querySelectorAll('.contact-form-wrapper input, .contact-form-wrapper select, .contact-form-wrapper textarea');
+    const name = inputs[0].value || 'A student';
+    const phone = inputs[1].value || '';
+    const service = inputs[2].value || 'Not specified';
+    const details = inputs[3].value || '';
+    const msg = encodeURIComponent('Hello Delicate & Co!\n\nName: ' + name + '\nPhone: ' + phone + '\nService: ' + service + '\nDetails: ' + details + '\n\nPlease assist me.');
+    window.open('https://wa.me/263780197527?text=' + msg, '_blank');
+  }
+</script>
 </body>
 </html>
