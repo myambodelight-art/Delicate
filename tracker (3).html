@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Tracker — Delicate & Co</title>
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  body { background: var(--ink); min-height: 100vh; }
+
+  .tracker-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tracker-topbar {
+    padding: 22px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .tracker-topbar .brand { color: var(--paper); }
+  .tracker-topbar .back-link {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: rgba(247,244,237,0.6);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tracker-topbar .back-link:hover { color: var(--paper); }
+
+  /* ---------- LOCK SCREEN ---------- */
+  .lock-stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    position: relative;
+  }
+  .lock-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 80% 15%, rgba(201,162,75,0.14), transparent 45%),
+      radial-gradient(circle at 15% 85%, rgba(45,106,79,0.12), transparent 40%);
+    pointer-events: none;
+  }
+
+  .dossier {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    background: var(--paper);
+    border-radius: var(--radius-md);
+    padding: 40px 36px 36px;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.4);
+  }
+  .dossier-seal {
+    width: 64px; height: 64px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--brass);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    color: var(--brass);
+    text-align: center;
+    line-height: 1.3;
+  }
+  .dossier h1 {
+    font-size: 23px;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .dossier p.sub {
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--ink-60);
+    margin-bottom: 28px;
+  }
+
+  .pw-row { position: relative; margin-bottom: 8px; }
+  .pw-row input {
+    width: 100%;
+    padding: 14px 44px 14px 16px;
+    border: 1px solid var(--ink-15);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    background: #fff;
+    color: var(--ink);
+  }
+  .pw-row input:focus {
+    outline: none;
+    border-color: var(--brass);
+    box-shadow: 0 0 0 3px rgba(201,162,75,0.15);
+  }
+  .pw-row button.toggle-pw {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    font-size: 13px;
+    color: var(--ink-40);
+    cursor: pointer;
+    padding: 6px;
+  }
+
+  .dossier .btn { width: 100%; justify-content: center; margin-top: 14px; }
+
+  .pw-error {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 11px 14px;
+    background: var(--red-soft);
+    border: 1px solid var(--red);
+    border-radius: var(--radius-sm);
+    color: var(--red);
+    font-size: 13px;
+  }
+  .pw-error.show { display: flex; }
+
+  .dossier-foot {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--ink-15);
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-40);
+    font-family: var(--font-mono);
+  }
+
+  .dossier.unlocking {
+    animation: stampPulse 0.5s ease;
+  }
+  @keyframes stampPulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.97); }
+    70% { transform: scale(1.015); }
+    100% { transform: scale(1); }
+  }
+
+  /* ---------- LEDGER (UNLOCKED VIEW) ---------- */
+  .ledger-wrap { display: none; flex: 1; }
+  .ledger-wrap.show { display: block; }
+
+  .ledger-head-band {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 0 36px;
+  }
+  .ledger-head-band .wrap { padding-top: 8px; }
+  .ledger-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .ledger-title-row h1 { color: var(--paper); font-size: 30px; }
+  .ledger-title-row .eyebrow { color: var(--brass-soft); }
+  .ledger-title-row .eyebrow::before { background: var(--brass-soft); }
+
+  .lock-btn {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: rgba(247,244,237,0.7);
+    border: 1px solid rgba(247,244,237,0.25);
+    border-radius: var(--radius-sm);
+    padding: 9px 16px;
+    background: none;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .lock-btn:hover { border-color: var(--brass-soft); color: var(--paper); }
+
+  .sync-pill {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: rgba(247,244,237,0.55);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .sync-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .sync-pill.error .dot { background: var(--red); }
+  .sync-pill.loading .dot { background: var(--brass); }
+
+  .ledger-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 700px) { .ledger-stats { grid-template-columns: 1fr 1fr; } }
+  .led-stat {
+    background: rgba(247,244,237,0.05);
+    border: 1px solid rgba(247,244,237,0.12);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+  }
+  .led-stat .n { font-family: var(--font-display); font-size: 26px; color: var(--brass-soft); }
+  .led-stat .l { font-size: 12px; color: rgba(247,244,237,0.6); margin-top: 2px; }
+
+  .ledger-body { padding: 36px 0 80px; }
+
+  .ledger-toolbar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+  }
+  .toolbar-left { display: flex; gap: 10px; flex-wrap: wrap; }
+  .filter-chip {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--ink-15);
+    background: #fff;
+    color: var(--ink-60);
+    cursor: pointer;
+  }
+  .filter-chip.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .search-box {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 9px 14px;
+    border: 1px solid var(--ink-15);
+    border-radius: var(--radius-sm);
+    min-width: 220px;
+    background: #fff;
+  }
+  .search-box:focus { outline: none; border-color: var(--brass); }
+
+  .ledger-table-card {
+    background: #fff;
+    border: 1px solid var(--ink-15);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+  table.ledger-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.ledger-table thead th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-40);
+    background: var(--paper-dim);
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--ink-15);
+    white-space: nowrap;
+  }
+  table.ledger-table tbody td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--paper-dim);
+    vertical-align: top;
+  }
+  table.ledger-table tbody tr:last-child td { border-bottom: none; }
+  table.ledger-table tbody tr:hover { background: #fafaf7; }
+
+  .order-id { font-family: var(--font-mono); font-weight: 600; color: var(--ink); }
+  .order-name { font-weight: 600; }
+  .order-meta { font-size: 12.5px; color: var(--ink-60); margin-top: 2px; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    padding: 5px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+  }
+  .status-pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .status-pill.received { background: var(--paper-dim); color: var(--ink-60); }
+  .status-pill.received::before { background: var(--ink-40); }
+  .status-pill.progress { background: #FBF1DC; color: #9c7a2e; }
+  .status-pill.progress::before { background: var(--brass); }
+  .status-pill.review { background: #E4ECF7; color: #2c4a78; }
+  .status-pill.review::before { background: #2c4a78; }
+  .status-pill.done { background: var(--green-soft); color: var(--green); }
+  .status-pill.done::before { background: var(--green); }
+  .status-pill.urgent { background: var(--red-soft); color: var(--red); }
+  .status-pill.urgent::before { background: var(--red); }
+
+  .due-cell.overdue { color: var(--red); font-weight: 600; }
+  .due-cell .days { display: block; font-size: 11.5px; color: var(--ink-40); margin-top: 2px; }
+  .due-cell.overdue .days { color: var(--red); }
+
+  .file-cell a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 20px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+  .file-cell a:hover { background: var(--green-soft); }
+  .file-cell .no-file { font-size: 12px; color: var(--ink-40); font-family: var(--font-mono); }
+  .file-upload-btn {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-60);
+    border: 1px dashed var(--ink-15);
+    border-radius: 20px;
+    padding: 5px 12px;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .file-upload-btn:hover { border-color: var(--brass); color: var(--ink); }
+  .file-cell .stack { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+
+  .row-actions { display: flex; gap: 8px; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; color: var(--ink-40); padding: 4px;
+  }
+  .icon-btn:hover { color: var(--red); }
+
+  .empty-row td {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--ink-40);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 13.5px;
+    padding: 13px 22px;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    z-index: 300;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  @media (max-width: 760px) {
+    table.ledger-table thead { display: none; }
+    table.ledger-table, table.ledger-table tbody, table.ledger-table tr, table.ledger-table td { display: block; width: 100%; }
+    table.ledger-table tr { border-bottom: 1px solid var(--ink-15); padding: 16px 18px; }
+    table.ledger-table td { padding: 4px 0; border: none; }
+    table.ledger-table td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-40);
+      margin-bottom: 3px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="tracker-shell">
+  <div class="tracker-topbar">
+    <a href="#" class="brand" style="display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:600;font-size:18px;">
+      <span class="seal">D</span> Delicate &amp; Co
+    </a>
+    <a href="index.html" class="back-link">← Back to site</a>
+  </div>
+
+  <!-- LOCK SCREEN -->
+  <div class="lock-stage" id="lockStage">
+    <div class="dossier" id="dossier">
+      <div class="dossier-seal">REST<br>RICTED</div>
+      <h1>Order Tracker</h1>
+      <p class="sub">Staff access only. Enter the password to view live orders.</p>
+
+      <form id="lockForm" autocomplete="off">
+        <div class="pw-row">
+          <input type="password" id="pwInput" placeholder="Password" autocomplete="off" required>
+          <button type="button" class="toggle-pw" id="togglePw">show</button>
+        </div>
+        <button type="submit" class="btn btn-primary">🔓 Unlock Tracker</button>
+      </form>
+
+      <div class="pw-error" id="pwError">⚠ Incorrect password. Please try again.</div>
+
+      <div class="dossier-foot">CONFIDENTIAL · DELICATE &amp; CO INTERNAL USE</div>
+    </div>
+  </div>
+
+  <!-- LEDGER (UNLOCKED) -->
+  <div class="ledger-wrap" id="ledgerWrap">
+
+    <div class="ledger-head-band">
+      <div class="wrap">
+        <div class="ledger-title-row">
+          <div>
+            <div class="eyebrow">Internal Register · Shared with team</div>
+            <h1>Order Tracker</h1>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span class="sync-pill" id="syncPill"><span class="dot"></span> Connecting...</span>
+            <button class="lock-btn" id="lockBtn">🔒 Lock tracker</button>
+          </div>
+        </div>
+        <div class="ledger-stats" id="ledgerStats"></div>
+      </div>
+    </div>
+
+    <div class="wrap ledger-body">
+      <div class="ledger-toolbar">
+        <div class="toolbar-left" id="filterChips">
+          <button class="filter-chip active" data-filter="all">All</button>
+          <button class="filter-chip" data-filter="received">Received</button>
+          <button class="filter-chip" data-filter="progress">In Progress</button>
+          <button class="filter-chip" data-filter="review">In Review</button>
+          <button class="filter-chip" data-filter="done">Completed</button>
+        </div>
+        <input type="text" class="search-box" id="searchBox" placeholder="Search name, university, order ID...">
+      </div>
+
+      <div class="ledger-table-card">
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Student</th>
+              <th>University</th>
+              <th>Service</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th>File</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody">
+            <tr class="empty-row"><td colspan="8">Loading orders…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin-top:18px; font-size:12.5px; color:var(--ink-40); font-family:var(--font-mono);">
+        Shared live with your team. Anyone with the password sees the same orders and files.
+      </p>
+
+      <button class="btn btn-ghost" id="addOrderBtn" style="margin-top:8px;">+ Add Order</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD ORDER MODAL -->
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,28,46,0.55); z-index:200; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:8px; padding:30px; max-width:460px; width:100%; max-height:90vh; overflow-y:auto;">
+    <h3 style="font-family:var(--font-display); font-size:20px; margin-bottom:18px;">Add Order</h3>
+    <form id="addOrderForm">
+      <div class="form-row"><label>Student Name</label><input type="text" id="newName" required></div>
+      <div class="form-row"><label>University</label><input type="text" id="newUni" required placeholder="e.g. University of Zimbabwe (UZ)"></div>
+      <div class="form-row"><label>Service</label><input type="text" id="newService" required placeholder="e.g. Chapter 4 — SPSS Analysis"></div>
+      <div class="form-row"><label>Due Date</label><input type="date" id="newDue" required></div>
+      <div class="form-row">
+        <label>Status</label>
+        <select id="newStatus">
+          <option value="received">Received</option>
+          <option value="progress">In Progress</option>
+          <option value="review">In Review</option>
+          <option value="done">Completed</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Attach File (optional)</label>
+        <input type="file" id="newFile" accept=".pdf,.doc,.docx">
+      </div>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button type="button" class="btn btn-ghost" id="cancelAdd" style="flex:1; justify-content:center;">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveOrderBtn" style="flex:1; justify-content:center;">Save Order</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- UPLOAD FILE MODAL (for existing rows) -->
+<div id="uploadOverlay" style="display:none; position:fixed; inset:0; background:rgba(15,28,46,0.55); z-index:200; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#fff; border-radius:8px; padding:30px; max-width:420px; width:100%;">
+    <h3 style="font-family:var(--font-display); font-size:19px; margin-bottom:6px;">Attach File</h3>
+    <p style="font-size:13px; color:var(--ink-60); margin-bottom:18px;" id="uploadOrderLabel"></p>
+    <form id="uploadForm">
+      <div class="form-row"><input type="file" id="uploadFileInput" accept=".pdf,.doc,.docx" required></div>
+      <div style="display:flex; gap:10px; margin-top:16px;">
+        <button type="button" class="btn btn-ghost" id="cancelUpload" style="flex:1; justify-content:center;">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="confirmUploadBtn" style="flex:1; justify-content:center;">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   SECURITY NOTE:
+   The password below is a client-side gate only — it keeps
+   casual visitors out, but anyone who inspects this page's
+   source code can read it. Treat this as a light front door,
+   not a vault. Real authentication would require a backend
+   login system tied to user accounts.
+   ========================================================= */
+
+const SITE_PASSWORD = "Dean @2803";
+const SESSION_KEY = "delicate_tracker_unlocked";
+
+/* ---------------- SUPABASE SETUP ---------------- */
+const SUPABASE_URL = "https://vcektitjggzijnzzcxrm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_KFF1CpZXUu5p6zdVT25m6g_TmbTaUKJ";
+const TABLE_NAME = "Orders";
+const BUCKET_NAME = "Order-files";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---------------- LOCK / UNLOCK ---------------- */
+const lockStage = document.getElementById('lockStage');
+const ledgerWrap = document.getElementById('ledgerWrap');
+const dossier = document.getElementById('dossier');
+const lockForm = document.getElementById('lockForm');
+const pwInput = document.getElementById('pwInput');
+const pwError = document.getElementById('pwError');
+const togglePw = document.getElementById('togglePw');
+
+togglePw.addEventListener('click', () => {
+  const isPw = pwInput.type === 'password';
+  pwInput.type = isPw ? 'text' : 'password';
+  togglePw.textContent = isPw ? 'hide' : 'show';
+});
+
+function unlock() {
+  dossier.classList.add('unlocking');
+  setTimeout(() => {
+    lockStage.style.display = 'none';
+    ledgerWrap.classList.add('show');
+    initLedger();
+  }, 260);
+}
+
+lockForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (pwInput.value === SITE_PASSWORD) {
+    pwError.classList.remove('show');
+    sessionStorage.setItem(SESSION_KEY, '1');
+    unlock();
+  } else {
+    pwError.classList.add('show');
+    dossier.classList.remove('unlocking');
+    pwInput.value = '';
+    pwInput.focus();
+  }
+});
+
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  lockStage.style.display = 'none';
+  ledgerWrap.classList.add('show');
+  initLedger();
+}
+
+document.getElementById('lockBtn').addEventListener('click', () => {
+  sessionStorage.removeItem(SESSION_KEY);
+  ledgerWrap.classList.remove('show');
+  lockStage.style.display = 'flex';
+  pwInput.value = '';
+  pwInput.focus();
+});
+
+/* ---------------- TOAST ---------------- */
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+/* ---------------- SYNC STATUS ---------------- */
+function setSyncStatus(state) {
+  const pill = document.getElementById('syncPill');
+  pill.classList.remove('error', 'loading');
+  if (state === 'ok') pill.innerHTML = '<span class="dot"></span> Live · synced with team';
+  else if (state === 'loading') { pill.classList.add('loading'); pill.innerHTML = '<span class="dot"></span> Syncing...'; }
+  else { pill.classList.add('error'); pill.innerHTML = '<span class="dot"></span> Connection issue — retrying'; }
+}
+
+/* ---------------- DATA STATE ---------------- */
+let orders = [];
+let currentFilter = 'all';
+let currentSearch = '';
+
+const statusLabels = {
+  received: "Received",
+  progress: "In Progress",
+  review: "In Review",
+  done: "Completed"
+};
+
+function daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const due = new Date(dateStr + "T00:00:00");
+  return Math.round((due - today) / 86400000);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : str;
+  return div.innerHTML;
+}
+
+/* ---------------- INIT ---------------- */
+let initialized = false;
+async function initLedger() {
+  if (initialized) return;
+  initialized = true;
+  await fetchOrders();
+}
+
+/* ---------------- FETCH ---------------- */
+async function fetchOrders() {
+  setSyncStatus('loading');
+  const { data, error } = await sb
+    .from(TABLE_NAME)
+    .select('*')
+    .order('due_date', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    setSyncStatus('error');
+    const detail = (error.message || '') + (error.hint ? ' | Hint: ' + error.hint : '') + (error.code ? ' | Code: ' + error.code : '');
+    showToast('Could not load orders. Check connection.', true);
+    document.getElementById('ledgerBody').innerHTML =
+      `<tr class="empty-row"><td colspan="8">Failed to load orders.<br><span style="color:var(--red); font-size:11.5px;">${escapeHtml(detail)}</span></td></tr>`;
+    return;
+  }
+
+  setSyncStatus('ok');
+  orders = data || [];
+  renderLedger();
+}
+
+/* ---------------- RENDER ---------------- */
+function renderStats() {
+  const total = orders.length;
+  const active = orders.filter(o => o.status !== 'done').length;
+  const dueSoon = orders.filter(o => o.status !== 'done' && o.due_date && daysUntil(o.due_date) <= 2 && daysUntil(o.due_date) >= 0).length;
+  const overdue = orders.filter(o => o.status !== 'done' && o.due_date && daysUntil(o.due_date) < 0).length;
+
+  document.getElementById('ledgerStats').innerHTML = `
+    <div class="led-stat"><div class="n">${total}</div><div class="l">Total Orders</div></div>
+    <div class="led-stat"><div class="n">${active}</div><div class="l">Active Orders</div></div>
+    <div class="led-stat"><div class="n">${dueSoon}</div><div class="l">Due Within 48hrs</div></div>
+    <div class="led-stat"><div class="n">${overdue}</div><div class="l">Overdue</div></div>
+  `;
+}
+
+function renderLedger() {
+  renderStats();
+
+  let filtered = orders.filter(o => currentFilter === 'all' || o.status === currentFilter);
+  if (currentSearch.trim()) {
+    const q = currentSearch.toLowerCase();
+    filtered = filtered.filter(o =>
+      (o.student_name || '').toLowerCase().includes(q) ||
+      (o.university || '').toLowerCase().includes(q) ||
+      (o.order_id || '').toLowerCase().includes(q) ||
+      (o.services || '').toLowerCase().includes(q)
+    );
+  }
+
+  const tbody = document.getElementById('ledgerBody');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="8">No matching orders found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o => {
+    const hasDue = !!o.due_date;
+    const dleft = hasDue ? daysUntil(o.due_date) : null;
+    const overdue = hasDue && o.status !== 'done' && dleft < 0;
+    let dayLabel = '';
+    if (hasDue) {
+      if (o.status === 'done') dayLabel = 'Delivered';
+      else if (dleft < 0) dayLabel = `${Math.abs(dleft)} day${Math.abs(dleft) === 1 ? '' : 's'} overdue`;
+      else if (dleft === 0) dayLabel = 'Due today';
+      else dayLabel = `${dleft} day${dleft === 1 ? '' : 's'} left`;
+    }
+
+    let pillClass = o.status;
+    if (overdue) pillClass = 'urgent';
+
+    const fileCell = o.file_path
+      ? `<div class="stack">
+           <a href="${escapeHtml(o.file_path)}" target="_blank" rel="noopener">⬇ Download</a>
+           <button class="file-upload-btn" data-replace="${o.id}">Replace file</button>
+         </div>`
+      : `<div class="stack">
+           <span class="no-file">No file</span>
+           <button class="file-upload-btn" data-upload="${o.id}">+ Attach file</button>
+         </div>`;
+
+    return `
+      <tr>
+        <td data-label="Order ID"><span class="order-id">${escapeHtml(o.order_id)}</span></td>
+        <td data-label="Student"><span class="order-name">${escapeHtml(o.student_name)}</span></td>
+        <td data-label="University">${escapeHtml(o.university)}</td>
+        <td data-label="Service">${escapeHtml(o.services)}</td>
+        <td data-label="Due Date" class="due-cell ${overdue ? 'overdue' : ''}">
+          ${hasDue ? formatDate(o.due_date) : '—'}
+          ${hasDue ? `<span class="days">${dayLabel}</span>` : ''}
+        </td>
+        <td data-label="Status">
+          <select class="status-pill ${pillClass}" data-status-id="${o.id}">
+            <option value="received" ${o.status === 'received' ? 'selected' : ''}>Received</option>
+            <option value="progress" ${o.status === 'progress' ? 'selected' : ''}>In Progress</option>
+            <option value="review" ${o.status === 'review' ? 'selected' : ''}>In Review</option>
+            <option value="done" ${o.status === 'done' ? 'selected' : ''}>Completed</option>
+          </select>
+        </td>
+        <td data-label="File" class="file-cell">${fileCell}</td>
+        <td data-label="">
+          <div class="row-actions">
+            <button class="icon-btn" data-delete="${o.id}" title="Delete order">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  attachRowListeners();
+}
+
+function attachRowListeners() {
+  document.querySelectorAll('[data-status-id]').forEach(sel => {
+    sel.addEventListener('change', async (e) => {
+      const id = e.target.getAttribute('data-status-id');
+      const newStatus = e.target.value;
+      const { error } = await sb.from(TABLE_NAME).update({ status: newStatus }).eq('id', id);
+      if (error) {
+        showToast('Could not update status.', true);
+        console.error(error);
+      } else {
+        showToast('Status updated.');
+        await fetchOrders();
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const id = e.currentTarget.getAttribute('data-delete');
+      if (!confirm('Delete this order? This cannot be undone.')) return;
+      const { error } = await sb.from(TABLE_NAME).delete().eq('id', id);
+      if (error) {
+        showToast('Could not delete order.', true);
+        console.error(error);
+      } else {
+        showToast('Order deleted.');
+        await fetchOrders();
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-upload], [data-replace]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-upload') || e.currentTarget.getAttribute('data-replace');
+      openUploadModal(id);
+    });
+  });
+}
+
+/* ---------------- FILTER / SEARCH ---------------- */
+document.getElementById('filterChips').addEventListener('click', (e) => {
+  if (!e.target.classList.contains('filter-chip')) return;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  currentFilter = e.target.dataset.filter;
+  renderLedger();
+});
+
+document.getElementById('searchBox').addEventListener('input', (e) => {
+  currentSearch = e.target.value;
+  renderLedger();
+});
+
+/* ---------------- ADD ORDER ---------------- */
+const modalOverlay = document.getElementById('modalOverlay');
+document.getElementById('addOrderBtn').addEventListener('click', () => {
+  modalOverlay.style.display = 'flex';
+});
+document.getElementById('cancelAdd').addEventListener('click', () => {
+  modalOverlay.style.display = 'none';
+});
+modalOverlay.addEventListener('click', (e) => {
+  if (e.target === modalOverlay) modalOverlay.style.display = 'none';
+});
+
+function generateOrderId() {
+  const nums = orders.map(o => {
+    const m = (o.order_id || '').match(/(\d+)$/);
+    return m ? parseInt(m[1], 10) : 0;
+  });
+  const next = (nums.length ? Math.max(...nums) : 1040) + 1;
+  return `DC-${next}`;
+}
+
+async function uploadFile(file, orderIdLabel) {
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  const path = `${orderIdLabel}-${Date.now()}-${safeName}`;
+  const { error: uploadError } = await sb.storage.from(BUCKET_NAME).upload(path, file);
+  if (uploadError) throw uploadError;
+  const { data: urlData } = sb.storage.from(BUCKET_NAME).getPublicUrl(path);
+  return urlData.publicUrl;
+}
+
+document.getElementById('addOrderForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const saveBtn = document.getElementById('saveOrderBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
+
+  try {
+    const orderId = generateOrderId();
+    const fileInput = document.getElementById('newFile');
+    let filePath = null;
+
+    if (fileInput.files && fileInput.files[0]) {
+      filePath = await uploadFile(fileInput.files[0], orderId);
+    }
+
+    const newOrder = {
+      order_id: orderId,
+      student_name: document.getElementById('newName').value.trim(),
+      university: document.getElementById('newUni').value.trim(),
+      services: document.getElementById('newService').value.trim(),
+      due_date: document.getElementById('newDue').value,
+      status: document.getElementById('newStatus').value,
+      file_path: filePath
+    };
+
+    const { error } = await sb.from(TABLE_NAME).insert([newOrder]);
+    if (error) throw error;
+
+    showToast('Order added.');
+    modalOverlay.style.display = 'none';
+    document.getElementById('addOrderForm').reset();
+    await fetchOrders();
+  } catch (err) {
+    console.error(err);
+    showToast('Could not save order. ' + (err.message || ''), true);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Order';
+  }
+});
+
+/* ---------------- ATTACH / REPLACE FILE ON EXISTING ORDER ---------------- */
+const uploadOverlay = document.getElementById('uploadOverlay');
+const uploadForm = document.getElementById('uploadForm');
+let uploadTargetId = null;
+
+function openUploadModal(id) {
+  uploadTargetId = id;
+  const order = orders.find(o => String(o.id) === String(id));
+  document.getElementById('uploadOrderLabel').textContent = order
+    ? `For order ${order.order_id} — ${order.student_name}`
+    : '';
+  uploadOverlay.style.display = 'flex';
+}
+
+document.getElementById('cancelUpload').addEventListener('click', () => {
+  uploadOverlay.style.display = 'none';
+  uploadTargetId = null;
+});
+uploadOverlay.addEventListener('click', (e) => {
+  if (e.target === uploadOverlay) { uploadOverlay.style.display = 'none'; uploadTargetId = null; }
+});
+
+uploadForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('confirmUploadBtn');
+  const fileInput = document.getElementById('uploadFileInput');
+  if (!fileInput.files || !fileInput.files[0] || !uploadTargetId) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Uploading...';
+
+  try {
+    const order = orders.find(o => String(o.id) === String(uploadTargetId));
+    const label = order ? order.order_id : 'order';
+    const url = await uploadFile(fileInput.files[0], label);
+
+    const { error } = await sb.from(TABLE_NAME).update({ file_path: url }).eq('id', uploadTargetId);
+    if (error) throw error;
+
+    showToast('File attached.');
+    uploadOverlay.style.display = 'none';
+    uploadForm.reset();
+    uploadTargetId = null;
+    await fetchOrders();
+  } catch (err) {
+    console.error(err);
+    showToast('Upload failed. ' + (err.message || ''), true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Upload';
+  }
+});
+
+/* ---------------- LIVE SYNC (auto-refresh every 20s) ---------------- */
+setInterval(() => {
+  if (ledgerWrap.classList.contains('show')) fetchOrders();
+}, 20000);
+</script>
+
+</body>
+</html>
