@@ -512,5 +512,288 @@
   });
 </script>
 
-</body>
+</body><!-- =======================================================
+     DELICATE & CO — FAQ CHAT WIDGET
+     Paste this whole block right before the closing </body>
+     tag on every page you want it to appear on.
+     No API keys, no backend, no cost — runs entirely in
+     the visitor's browser and works on GitHub Pages as-is.
+======================================================= -->
+<style>
+  #dc-chat-launcher {
+    position: fixed;
+    bottom: 22px;
+    right: 22px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #b8873f, #8a5a2b);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9999;
+    border: none;
+    transition: transform 0.2s ease;
+  }
+  #dc-chat-launcher:hover { transform: scale(1.06); }
+  #dc-chat-launcher svg { width: 28px; height: 28px; fill: #fff; }
+  #dc-chat-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #d64545;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: system-ui, sans-serif;
+  }
+
+  #dc-chat-window {
+    position: fixed;
+    bottom: 96px;
+    right: 22px;
+    width: 340px;
+    max-width: calc(100vw - 32px);
+    height: 460px;
+    max-height: calc(100vh - 140px);
+    background: #fdfaf5;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 9999;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    border: 1px solid #e8ddc9;
+  }
+  #dc-chat-window.dc-open { display: flex; }
+
+  #dc-chat-header {
+    background: linear-gradient(135deg, #2b2118, #4a3620);
+    color: #f7efe0;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #dc-chat-header .dc-title { font-weight: 700; font-size: 15px; }
+  #dc-chat-header .dc-sub { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+  #dc-chat-close {
+    background: none; border: none; color: #f7efe0; font-size: 20px;
+    cursor: pointer; line-height: 1; padding: 4px;
+  }
+
+  #dc-chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fdfaf5;
+  }
+  .dc-msg { max-width: 85%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.45; }
+  .dc-msg.dc-bot { background: #f1e6d2; color: #2b2118; align-self: flex-start; border-bottom-left-radius: 3px; }
+  .dc-msg.dc-user { background: #8a5a2b; color: #fff; align-self: flex-end; border-bottom-right-radius: 3px; }
+
+  .dc-suggestions { display: flex; flex-direction: column; gap: 6px; margin-top: 2px; }
+  .dc-suggestion-btn {
+    background: #fff; border: 1px solid #d8c9a8; color: #5a4326;
+    text-align: left; font-size: 12.5px; padding: 7px 10px; border-radius: 8px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .dc-suggestion-btn:hover { background: #f1e6d2; }
+
+  #dc-chat-inputbar {
+    display: flex; gap: 8px; padding: 10px; border-top: 1px solid #e8ddc9; background: #fff;
+  }
+  #dc-chat-input {
+    flex: 1; border: 1px solid #d8c9a8; border-radius: 20px; padding: 8px 14px;
+    font-size: 13.5px; outline: none;
+  }
+  #dc-chat-input:focus { border-color: #b8873f; }
+  #dc-chat-send {
+    background: #8a5a2b; border: none; color: #fff; border-radius: 50%;
+    width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  #dc-chat-send svg { width: 16px; height: 16px; fill: #fff; }
+
+  @media (max-width: 420px) {
+    #dc-chat-window { right: 10px; bottom: 86px; width: calc(100vw - 20px); }
+    #dc-chat-launcher { right: 14px; bottom: 14px; }
+  }
+</style>
+
+<button id="dc-chat-launcher" aria-label="Open FAQ chat">
+  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.02 2 11c0 2.61 1.35 4.94 3.5 6.55V22l4.06-2.16c.79.15 1.6.24 2.44.24 5.52 0 10-4.02 10-9s-4.48-9-10-9z"/></svg>
+  <span id="dc-chat-badge">1</span>
+</button>
+
+<div id="dc-chat-window">
+  <div id="dc-chat-header">
+    <div>
+      <div class="dc-title">Delicate & Co Assistant</div>
+      <div class="dc-sub">Usually replies instantly</div>
+    </div>
+    <button id="dc-chat-close" aria-label="Close chat">×</button>
+  </div>
+  <div id="dc-chat-body"></div>
+  <div id="dc-chat-inputbar">
+    <input id="dc-chat-input" type="text" placeholder="Ask a question..." autocomplete="off" />
+    <button id="dc-chat-send" aria-label="Send">
+      <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ---- FAQ knowledge base (edit/add entries here) ----
+  var FAQ = [
+    {
+      keywords: ["turnaround", "how long", "time", "fast", "hours", "quick", "urgent", "deadline"],
+      question: "How long does a plagiarism check take?",
+      answer: "Most plagiarism checks and reports are completed within 2–6 hours. For urgent orders, a 24-hour turnaround is guaranteed."
+    },
+    {
+      keywords: ["confidential", "private", "privacy", "safe", "secure", "share my"],
+      question: "Is my work kept confidential?",
+      answer: "Yes, completely. We never share your documents, personal information, or order details with any third party — your privacy is our highest priority."
+    },
+    {
+      keywords: ["tool", "turnitin", "ithenticate", "which software", "detector"],
+      question: "What plagiarism tools do you use?",
+      answer: "We use industry-leading tools including Turnitin and iThenticate for accurate similarity reports, and can check against specific institutional requirements on request."
+    },
+    {
+      keywords: ["chapter", "dissertation", "thesis", "write my", "methodology", "chapters"],
+      question: "Can you write all chapters of my dissertation?",
+      answer: "We specialize in Chapters 3 (Methodology), 4 (Data Presentation & Analysis), and 5 (Conclusions & Recommendations). Each chapter is $20 and includes proper referencing and SPSS work where needed."
+    },
+    {
+      keywords: ["pay", "payment", "cost", "price", "how much", "fee"],
+      question: "How do I pay and receive my work?",
+      answer: "All services are $20 per report/chapter (website creation is $30). Contact us on WhatsApp to confirm scope and payment, then we deliver your completed work via WhatsApp or email."
+    },
+    {
+      keywords: ["revision", "not happy", "changes", "edit again", "redo"],
+      question: "Do you offer revisions?",
+      answer: "Yes — free revisions if the delivered work doesn't meet the agreed requirements. We work with you until you're satisfied."
+    },
+    {
+      keywords: ["ai detect", "humaniz", "gpt", "chatgpt", "originality"],
+      question: "Do you handle AI content detection?",
+      answer: "Yes — we provide a full AI detection report and humanize flagged text so it reads naturally while keeping your original meaning, ready for GPTZero and Originality.ai."
+    },
+    {
+      keywords: ["spss", "statistic", "data analysis", "quantitative"],
+      question: "Do you do SPSS analysis?",
+      answer: "Yes, we offer full IBM SPSS statistical analysis: data entry & cleaning, descriptive and inferential statistics, charts, tables, and a complete results write-up."
+    },
+    {
+      keywords: ["university", "school", "uz", "nust", "msu", "zou", "buse", "cut", "hit", "wua"],
+      question: "Which universities do you serve?",
+      answer: "We serve students at all universities across Zimbabwe, including UZ, NUST, MSU, ZOU, BUSE, CUT, HIT, WUA and more."
+    },
+    {
+      keywords: ["contact", "whatsapp", "reach", "number", "talk to someone", "human"],
+      question: "How can I contact you?",
+      answer: "The fastest way is WhatsApp — tap any of the WhatsApp buttons on this page (or use the Contact form) and our team will respond right away."
+    },
+    {
+      keywords: ["website creation", "build a website", "web design"],
+      question: "Do you build websites?",
+      answer: "Yes — a 5-page, mobile-responsive website with domain & hosting setup and a contact form, for $30, delivered in 5–7 days."
+    },
+    {
+      keywords: ["track", "tracker", "order status", "where is my order"],
+      question: "Can I track my order?",
+      answer: "Yes — use the 🔒 Order Tracker link in the top menu to check your order status."
+    }
+  ];
+
+  var body = document.getElementById('dc-chat-body');
+  var launcher = document.getElementById('dc-chat-launcher');
+  var win = document.getElementById('dc-chat-window');
+  var closeBtn = document.getElementById('dc-chat-close');
+  var input = document.getElementById('dc-chat-input');
+  var sendBtn = document.getElementById('dc-chat-send');
+  var badge = document.getElementById('dc-chat-badge');
+  var opened = false;
+
+  function addMsg(text, who) {
+    var div = document.createElement('div');
+    div.className = 'dc-msg ' + (who === 'user' ? 'dc-user' : 'dc-bot');
+    div.textContent = text;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function addSuggestions() {
+    var wrap = document.createElement('div');
+    wrap.className = 'dc-suggestions';
+    var picks = FAQ.slice(0, 4);
+    picks.forEach(function (item) {
+      var btn = document.createElement('button');
+      btn.className = 'dc-suggestion-btn';
+      btn.textContent = item.question;
+      btn.onclick = function () {
+        addMsg(item.question, 'user');
+        setTimeout(function () { addMsg(item.answer, 'bot'); }, 350);
+      };
+      wrap.appendChild(btn);
+    });
+    body.appendChild(wrap);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function findAnswer(text) {
+    var t = text.toLowerCase();
+    var best = null, bestScore = 0;
+    FAQ.forEach(function (item) {
+      var score = 0;
+      item.keywords.forEach(function (k) { if (t.indexOf(k) !== -1) score++; });
+      if (score > bestScore) { bestScore = score; best = item; }
+    });
+    return bestScore > 0 ? best.answer : null;
+  }
+
+  function handleSend() {
+    var text = input.value.trim();
+    if (!text) return;
+    addMsg(text, 'user');
+    input.value = '';
+    setTimeout(function () {
+      var ans = findAnswer(text);
+      if (ans) {
+        addMsg(ans, 'bot');
+      } else {
+        addMsg("I'm not 100% sure on that one — tap a WhatsApp button on this page and our team will help you directly and quickly!", 'bot');
+      }
+    }, 350);
+  }
+
+  launcher.addEventListener('click', function () {
+    win.classList.toggle('dc-open');
+    if (!opened) {
+      opened = true;
+      badge.style.display = 'none';
+      addMsg("Hi! 👋 I'm the Delicate & Co assistant. Ask me about turnaround time, pricing, confidentiality, or anything else — or pick a question below.", 'bot');
+      addSuggestions();
+    }
+  });
+  closeBtn.addEventListener('click', function () { win.classList.remove('dc-open'); });
+  sendBtn.addEventListener('click', handleSend);
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') handleSend(); });
+})();
+  </script>
 </html>
