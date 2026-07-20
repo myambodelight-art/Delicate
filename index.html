@@ -971,5 +971,303 @@
   }
 })();
   </script>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Delicate & Co — Avatar Assistant Widget</title>
+<style>
+  :root{
+    --navy:#152238;
+    --navy-2:#1f3252;
+    --cream:#F7F4EC;
+    --gold:#C9A227;
+    --verify:#2E8B74;
+    --ink:#1B2333;
+    --muted:#7C8698;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Georgia', 'Iowan Old Style', serif;
+    background:transparent;
+  }
+  /* ---------- Launcher ---------- */
+  #dc-launcher{
+    position:fixed; right:22px; bottom:22px;
+    width:64px; height:64px; border-radius:50%;
+    background:linear-gradient(145deg,var(--navy),var(--navy-2));
+    box-shadow:0 8px 24px rgba(21,34,56,.35);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:9999; border:2px solid var(--gold);
+    transition:transform .25s ease;
+  }
+  #dc-launcher:hover{transform:scale(1.06);}
+  #dc-launcher svg{width:34px;height:34px;}
+  #dc-launcher .ping{
+    position:absolute; top:-3px; right:-3px; width:14px; height:14px;
+    border-radius:50%; background:var(--verify); border:2px solid var(--cream);
+    animation:pulse 2s infinite;
+  }
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(46,139,116,.6);}
+    70%{box-shadow:0 0 0 8px rgba(46,139,116,0);}
+    100%{box-shadow:0 0 0 0 rgba(46,139,116,0);}
+  }
+
+  /* ---------- Panel ---------- */
+  #dc-panel{
+    position:fixed; right:22px; bottom:100px; width:340px; max-width:92vw;
+    height:480px; max-height:78vh; background:var(--cream);
+    border-radius:18px; box-shadow:0 20px 60px rgba(21,34,56,.4);
+    display:none; flex-direction:column; overflow:hidden; z-index:9999;
+    border:1px solid rgba(21,34,56,.08);
+  }
+  #dc-panel.open{display:flex; animation:rise .28s ease;}
+  @keyframes rise{from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);}}
+
+  #dc-head{
+    background:linear-gradient(135deg,var(--navy),var(--navy-2));
+    padding:14px 16px; display:flex; align-items:center; gap:12px;
+    color:var(--cream);
+  }
+  #dc-avatar-wrap{
+    width:52px; height:52px; border-radius:50%; background:var(--cream);
+    flex:none; display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--gold); overflow:hidden;
+  }
+  #dc-head-text{line-height:1.25;}
+  #dc-head-text b{font-size:15px; letter-spacing:.2px;}
+  #dc-head-text span{font-size:11px; color:#C7D0E0; font-family:Arial,sans-serif;}
+  #dc-status-dot{width:7px;height:7px;border-radius:50%;background:var(--verify);display:inline-block;margin-right:5px;}
+  #dc-close{margin-left:auto; cursor:pointer; opacity:.75; font-size:20px; line-height:1; color:var(--cream); font-family:Arial;}
+  #dc-close:hover{opacity:1;}
+
+  #dc-body{flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:10px; background:
+    radial-gradient(circle at top right, rgba(201,162,39,.06), transparent 60%), var(--cream);
+  }
+  .dc-msg{
+    max-width:82%; padding:10px 12px; border-radius:14px; font-size:13.5px;
+    line-height:1.45; font-family:Arial,Helvetica,sans-serif; white-space:pre-wrap;
+  }
+  .dc-bot{
+    align-self:flex-start; background:#fff; color:var(--ink);
+    border:1px solid rgba(21,34,56,.08); border-bottom-left-radius:4px;
+  }
+  .dc-user{
+    align-self:flex-end; background:var(--navy); color:#fff;
+    border-bottom-right-radius:4px;
+  }
+  .dc-chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:2px;}
+  .dc-chip{
+    font-family:Arial,sans-serif; font-size:12px; padding:6px 10px;
+    border-radius:999px; background:#fff; border:1px solid var(--gold);
+    color:var(--navy); cursor:pointer; transition:.15s;
+  }
+  .dc-chip:hover{background:var(--gold); color:#fff;}
+
+  #dc-typing{align-self:flex-start; display:none; padding:10px 12px;}
+  #dc-typing span{
+    width:6px;height:6px;background:var(--muted);border-radius:50%;
+    display:inline-block; margin-right:3px; animation:blink 1.1s infinite;
+  }
+  #dc-typing span:nth-child(2){animation-delay:.15s;}
+  #dc-typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes blink{0%,60%,100%{opacity:.25;} 30%{opacity:1;}}
+
+  #dc-input-row{
+    display:flex; gap:8px; padding:10px; background:#fff; border-top:1px solid rgba(21,34,56,.08);
+  }
+  #dc-input{
+    flex:1; border:1px solid #D7DCE5; border-radius:20px; padding:9px 14px;
+    font-family:Arial,sans-serif; font-size:13px; outline:none;
+  }
+  #dc-input:focus{border-color:var(--gold);}
+  #dc-send{
+    width:38px; height:38px; border-radius:50%; border:none; background:var(--navy);
+    color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    flex:none;
+  }
+  #dc-send:hover{background:var(--navy-2);}
+
+  /* ---------- Avatar face (SVG-driven talking animation) ---------- */
+  .dc-face-eye{transform-origin:center; animation:dc-blink 4.5s infinite;}
+  @keyframes dc-blink{
+    0%,92%,100%{transform:scaleY(1);}
+    95%{transform:scaleY(.08);}
+  }
+  #dc-mouth{transform-origin:center;}
+  .talking #dc-mouth{animation:dc-talk .42s infinite;}
+  @keyframes dc-talk{
+    0%{d:path("M 20 34 Q 26 34 32 34");}
+    50%{d:path("M 20 33 Q 26 40 32 33");}
+    100%{d:path("M 20 34 Q 26 34 32 34");}
+  }
+  .talking #dc-avatar-wrap{box-shadow:0 0 0 4px rgba(201,162,39,.35);}
+</style>
+</head>
+<body>
+
+<!-- Launcher bubble -->
+<div id="dc-launcher" title="Chat with Delicate & Co">
+  <div class="ping"></div>
+  <svg viewBox="0 0 52 52" fill="none">
+    <circle cx="26" cy="26" r="25" fill="#152238" stroke="#C9A227" stroke-width="1"/>
+    <circle cx="18" cy="24" r="2.4" fill="#F7F4EC"/>
+    <circle cx="34" cy="24" r="2.4" fill="#F7F4EC"/>
+    <path d="M17 33 Q26 39 35 33" stroke="#F7F4EC" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M14 16 L26 10 L38 16 L26 22 Z" fill="#C9A227"/>
+    <line x1="38" y1="16" x2="38" y2="24" stroke="#C9A227" stroke-width="1.6"/>
+  </svg>
+</div>
+
+<!-- Chat panel -->
+<div id="dc-panel">
+  <div id="dc-head">
+    <div id="dc-avatar-wrap">
+      <svg id="dc-face" viewBox="0 0 52 52" width="48" height="48">
+        <circle cx="26" cy="26" r="25" fill="#152238"/>
+        <ellipse class="dc-face-eye" cx="18" cy="24" rx="2.3" ry="2.6" fill="#F7F4EC"/>
+        <ellipse class="dc-face-eye" cx="34" cy="24" rx="2.3" ry="2.6" fill="#F7F4EC"/>
+        <path id="dc-mouth" d="M 20 34 Q 26 34 32 34" stroke="#F7F4EC" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M14 16 L26 10 L38 16 L26 22 Z" fill="#C9A227"/>
+        <line x1="38" y1="16" x2="38" y2="24" stroke="#C9A227" stroke-width="1.6"/>
+      </svg>
+    </div>
+    <div id="dc-head-text">
+      <b>Delicate &amp; Co Assistant</b><br>
+      <span><i id="dc-status-dot"></i>Online · usually replies instantly</span>
+    </div>
+    <div id="dc-close">&times;</div>
+  </div>
+
+  <div id="dc-body">
+    <div class="dc-msg dc-bot">Hi! 👋 I'm the Delicate &amp; Co assistant. I can help with plagiarism checks, AI humanizing, dissertation chapters, SPSS analysis, and pricing. What do you need help with?</div>
+    <div class="dc-chip-row" id="dc-chips"></div>
+    <div id="dc-typing"><span></span><span></span><span></span></div>
+  </div>
+
+  <div id="dc-input-row">
+    <input id="dc-input" type="text" placeholder="Type a message…" />
+    <button id="dc-send" title="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 12L21 3L14 21L11 13L3 12Z" fill="#fff"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const launcher = document.getElementById('dc-launcher');
+  const panel = document.getElementById('dc-panel');
+  const closeBtn = document.getElementById('dc-close');
+  const body = document.getElementById('dc-body');
+  const input = document.getElementById('dc-input');
+  const sendBtn = document.getElementById('dc-send');
+  const typing = document.getElementById('dc-typing');
+  const chips = document.getElementById('dc-chips');
+  const avatarWrap = document.getElementById('dc-avatar-wrap');
+
+  const WHATSAPP = "https://wa.me/263780197527";
+
+  launcher.addEventListener('click', () => {
+    panel.classList.toggle('open');
+    if(panel.classList.contains('open')) input.focus();
+  });
+  closeBtn.addEventListener('click', () => panel.classList.remove('open'));
+
+  function addMsg(text, who){
+    const el = document.createElement('div');
+    el.className = 'dc-msg ' + (who === 'user' ? 'dc-user' : 'dc-bot');
+    el.textContent = text;
+    body.insertBefore(el, typing);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function setChips(list){
+    chips.innerHTML = '';
+    list.forEach(c => {
+      const b = document.createElement('div');
+      b.className = 'dc-chip';
+      b.textContent = c;
+      b.onclick = () => handleUser(c);
+      chips.appendChild(b);
+    });
+  }
+
+  function talk(reply, chipList){
+    typing.style.display = 'block';
+    avatarWrap.parentElement.classList.add('talking');
+    body.scrollTop = body.scrollHeight;
+    setTimeout(() => {
+      typing.style.display = 'none';
+      addMsg(reply, 'bot');
+      if(chipList) setChips(chipList); else chips.innerHTML = '';
+      setTimeout(()=> avatarWrap.parentElement.classList.remove('talking'), 900);
+    }, 700 + Math.random()*400);
+  }
+
+  const MENU = ["Plagiarism check", "AI humanizing", "Dissertation writing", "SPSS analysis", "Pricing", "Talk to a human"];
+
+  function reply(msgRaw){
+    const m = msgRaw.toLowerCase();
+    if(/plagiar/.test(m)){
+      return ["Our Plagiarism Check & Paraphrasing is $20/report — a full similarity breakdown by source, plus professional paraphrasing, Turnitin/iThenticate compatible. Turnaround is usually 2–6 hours, 24hrs max.", ["Order this", "See pricing", "Talk to a human"]];
+    }
+    if(/humaniz|ai detect|gptzero|originality/.test(m)){
+      return ["AI Content Detection & Humanizing is $20/report. We flag AI-written sections and rewrite them to read naturally while keeping your original meaning — cleared for GPTZero & Originality.ai.", ["Order this", "See pricing", "Talk to a human"]];
+    }
+    if(/dissert|chapter|thesis/.test(m)){
+      return ["We write Chapters 1–5 (Intro, Lit Review, Methodology, Data Analysis, Conclusions) at $20/chapter. Right now Chapter 1 is only $5 (offer ends 30 August), including proper referencing.", ["Claim Ch.1 $5 offer", "See pricing", "Talk to a human"]];
+    }
+    if(/spss|statistic|data analysis/.test(m)){
+      return ["IBM SPSS Statistical Analysis is $20/report — data entry & cleaning, descriptive & inferential stats, charts/tables, and a full results write-up.", ["Order this", "See pricing", "Talk to a human"]];
+    }
+    if(/price|pricing|cost|how much|rates/.test(m)){
+      return ["Quick pricing:\n• Plagiarism Check — $20\n• AI Detection & Humanizing — $20\n• Dissertation Chapter — $20 (Ch.1 promo: $5, ends 30 Aug)\n• SPSS Analysis — $20\n• Data Collection — quote on request\n• Website Creation — $30", ["Order now", "Talk to a human"]];
+    }
+    if(/confidential|private|privacy/.test(m)){
+      return ["100% confidential — your documents and details are never shared with any third party.", MENU];
+    }
+    if(/turnaround|time|fast|urgent|deadline/.test(m)){
+      return ["Most reports are done in 2–6 hours, with a guaranteed 24-hour turnaround even for larger documents.", MENU];
+    }
+    if(/human|agent|whatsapp|order|contact|talk to/.test(m)){
+      return ["__WHATSAPP__", null];
+    }
+    if(/hi|hello|hey/.test(m)){
+      return ["Hello! What can I help you with today?", MENU];
+    }
+    return ["I can help with plagiarism checks, AI humanizing, dissertation chapters, SPSS analysis, or pricing — or I can connect you straight to a human on WhatsApp. What would you like?", MENU];
+  }
+
+  function handleUser(text){
+    addMsg(text, 'user');
+    chips.innerHTML = '';
+    const [r, chipList] = reply(text);
+    if(r === "__WHATSAPP__"){
+      talk("Sure — I'll open WhatsApp so our team can help you directly.", null);
+      setTimeout(()=> window.open(WHATSAPP, '_blank'), 1000);
+    } else {
+      talk(r, chipList);
+    }
+  }
+
+  sendBtn.addEventListener('click', () => {
+    const v = input.value.trim();
+    if(!v) return;
+    input.value = '';
+    handleUser(v);
+  });
+  input.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ sendBtn.click(); }
+  });
+
+  // initial menu chips
+  setChips(MENU);
+})();
+</script>
+</body>
+</html>
+
 </body>
 </html>
