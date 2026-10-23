@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delicate & Co — Secure Client Details</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0f2a4a;--navy2:#1a3d6b;--gold:#c9a227;--bg:#f0f4f8;--border:#dde4ed;--muted:#5a6e85;--red:#c0392b;--green:#1a7a4a}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;padding:24px 14px}
+.card{max-width:560px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 8px 30px rgba(15,42,74,.12);overflow:hidden}
+.head{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:24px}
+.head h1{font-size:20px}.head p{font-size:13px;opacity:.75;margin-top:6px}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 24px;background:#f7f9fc;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted)}
+.meta b{display:block;color:var(--navy);font-size:13px}.meta .exp{color:var(--red)}
+.body{padding:24px}.hide{display:none}
+h2{font-size:15px;padding-bottom:8px;border-bottom:2px solid var(--border);margin-bottom:16px}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:12px 0 5px}
+input,select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--navy)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:8px;background:var(--gold);color:#081a30;font-weight:700;font-size:14px;cursor:pointer}
+button:disabled{background:#ddd;color:#999;cursor:not-allowed}
+.msg{margin-top:14px;padding:12px;border-radius:8px;font-size:13px}
+.err{background:#fdf0ee;color:var(--red);border:1px solid #f0c4be}
+.ok{background:#e8f7ef;color:var(--green);border:1px solid #b7e0c8}
+.errs{background:#f8d7da;color:#842029;font-size:12px;line-height:1.7;padding:12px;border-radius:8px;margin-top:14px}
+.foot{text-align:center;font-size:11px;color:#8fa3b8;margin-top:18px}
+</style></head><body>
+<div class="card">
+  <div class="head"><h1>Secure Client Details</h1><p>Complete your details so we can process your order.</p></div>
+  <div class="meta"><div>Order<b id="mOrder">—</b></div><div>Client<b id="mName">—</b></div><div>Expires<b class="exp" id="mExp">—</b></div></div>
+  <div class="body">
+    <div id="dead" class="msg err hide"></div>
+
+    <div id="verify" class="hide">
+      <h2>Step 1: Verify it's you</h2>
+      <label>Enter your Order Number</label>
+      <input id="vOrder" placeholder="e.g. DC-1041">
+      <button id="vBtn">Verify &amp; Continue</button>
+      <div id="vMsg"></div>
+    </div>
+
+    <div id="form" class="hide">
+      <h2>Your details</h2>
+      <label>Full name *</label><input id="fFull">
+      <div class="row"><div><label>University *</label><input id="fUni"></div><div><label>Phone *</label><input id="fPhone" inputmode="tel"></div></div>
+      <label>Preferred payment method *</label>
+      <select id="fPay"><option value="">Select…</option><option>EcoCash</option><option>InnBucks</option><option>Bank transfer</option><option>Cash</option></select>
+      <label>Email (for delivery of results)</label><input id="fEmail" type="email">
+      <div id="errs" class="errs hide"></div>
+      <button id="sBtn">Continue to Payment</button>
+    </div>
+
+    <div id="payNowBox" style="margin-bottom:16px;"></div>
+
+    <div id="done" class="hide"><div class="msg ok"><b>✓ Details received.</b><br>Delicate &amp; Co will be in touch shortly.</div>
+      <div id="ecoBox" style="margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:10px;"></div></div>
+  </div>
+</div>
+<div class="foot">Delicate &amp; Co — Secure Details Collection</div>
+<script src="config.js"></script>
+<script src="providers.js"></script>
+<script>
+const $=id=>document.getElementById(id), show=id=>$(id).classList.remove('hide'), hide=id=>$(id).classList.add('hide');
+const raw=location.hash.slice(1).split('.'), token=raw[0], provider=window.PROVIDERS[raw[1]]||window.PROVIDERS.delight; let payAmount=null; let idOk=false, expAt=0, timer;
+const api=(action,extra={})=>fetch(window.DC.API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action,token,...extra})}).then(r=>r.json());
+const dead={invalid:'This link is invalid. Please request a new one.',expired:'This link has expired. Please contact Delicate & Co for a new one.',locked:'Too many failed attempts. Link locked — please contact Delicate & Co.',submitted:'These details were already submitted. Thank you!'};
+function die(st){['verify','form'].forEach(hide);$('dead').textContent=dead[st]||'Something went wrong.';show('dead');if(st==='submitted')loadPay()}
+function tick(){const ms=expAt-Date.now();if(ms<=0){clearInterval(timer);return die('expired')}$('mExp').textContent=Math.floor(ms/36e5)+'h '+Math.floor(ms%36e5/6e4)+'m'}
+(async()=>{
+  if(!token)return die('invalid');
+  let r;try{r=await api('info')}catch(e){return die('x')}
+  if(r.state!=='ok')return die(r.state);
+  $('mOrder').textContent=/^\d+$/.test(r.order_id)?'#'+r.order_id:r.order_id;$('mName').textContent=r.name;$('fFull').value=r.name||'';
+  payAmount=r.amount;expAt=new Date(r.expires_at).getTime();tick();timer=setInterval(tick,30000);
+  show(r.verified?'form':'verify');
+})();
+$('vBtn').onclick=async()=>{
+  const r=await api('verify',{order:$('vOrder').value});
+  if(r.ok){hide('verify');show('form')}
+  else if(r.state&&r.state!=='ok')die(r.state);
+  else $('vMsg').innerHTML='<div class="msg err">Order number does not match. '+r.attempts_left+' attempt left.</div>';
+};
+const esc=x=>String(x).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cp=v=>'<button type="button" onclick="navigator.clipboard.writeText(\''+v+'\');this.textContent=\'Copied\'" style="width:auto;margin:0 0 0 8px;padding:4px 10px;font-size:12px;background:#eef2f7;color:#0f2a4a">Copy</button>';
+function showEco(){
+  const P=provider,m=$('fPay').value,a=parseFloat(payAmount),amt=a>0?(Number.isInteger(a)?String(a):a.toFixed(2)):null;
+  const wa='<a href="https://wa.me/'+P.whatsapp+'" style="color:#1565c0">WhatsApp '+esc(P.name)+'</a>';
+  let h='<h2>Payment</h2><p style="font-size:14px;line-height:1.7">'+(amt?'Amount: <b>$'+amt+'</b><br>':'')+'Pay to: <b>'+esc(P.name)+'</b></p>';
+  if(m==='EcoCash'){
+    if(!P.ecocash)h+='<p style="font-size:14px">Please '+wa+' for EcoCash details.</p>';
+    else{h+='<p style="font-size:14px">EcoCash number: <b>'+P.ecocash+'</b>'+cp(P.ecocash)+'</p>';
+      if(amt){const code='*151*2*1*1*'+P.ecocash+'*'+amt+'#';
+        h+='<a href="tel:'+encodeURIComponent(code)+'" style="display:block;margin-top:12px;padding:13px;border-radius:8px;background:var(--gold);color:#081a30;font-weight:700;text-align:center;text-decoration:none">📱 Tap to dial EcoCash</a>'+
+           '<p style="font-size:13px;margin-top:12px;color:var(--muted)">Or dial this code yourself:<br><b style="color:var(--navy);font-size:15px;word-break:break-all">'+code+'</b></p>'}}
+  }else if(m==='InnBucks'){
+    h+=P.innbucks?'<p style="font-size:14px">InnBucks number: <b>'+P.innbucks+'</b>'+cp(P.innbucks)+'</p>':'<p style="font-size:14px">Please '+wa+' for InnBucks details.</p>';
+  }else if(m==='Bank transfer'){
+    h+=P.banks.length?P.banks.map(x=>'<p style="font-size:14px;margin-top:8px"><b>'+esc(x.label)+'</b><br>Account: <b>'+esc(x.acc)+'</b>'+cp(x.acc)+'<br>Name: '+esc(P.name)+'</p>').join('')+
+      '<p style="font-size:12px;color:var(--muted);margin-top:8px">For the ZWG account, pay the ZWG equivalent at today\'s rate.</p>':'<p style="font-size:14px">Please '+wa+' for bank details.</p>';
+  }else h+='<p style="font-size:14px">Delicate &amp; Co will contact you to arrange cash payment.</p>';
+  h+='<p style="font-size:12px;color:var(--muted);margin-top:10px">Check that the name shown matches the one above before you approve, then send proof of payment on WhatsApp.</p>';
+  $('ecoBox').innerHTML=h;
+}
+$('sBtn').onclick=async()=>{
+  const req={'Full Name':'fFull','University':'fUni','Phone Number':'fPhone','Payment Method':'fPay'};
+  const miss=Object.keys(req).filter(k=>!$(req[k]).value.trim()).map(k=>k+' is required');
+  if(miss.length){$('errs').innerHTML=miss.join('<br>');show('errs');return}
+  hide('errs');const d={};Object.keys(req).forEach(k=>d[k]=$(req[k]).value.trim());d.Email=$('fEmail').value.trim();
+  $('sBtn').disabled=true;const r=await api('submit',{details:d});
+  if(r.ok){hide('form');showEco();show('done');loadPay(true)}else{$('errs').innerHTML='Could not submit. Please try again.';show('errs');$('sBtn').disabled=false}
+};
+
+async function loadPay(auto){
+  const box=$('payNowBox');
+  try{
+    const r=await api('pay_link',{check:true});
+    if(r.paid){box.innerHTML='<div class="msg ok"><b>✓ Payment received.</b><br>Thank you. Delicate &amp; Co will continue with your order.</div>';$('ecoBox').classList.add('hide');return}
+    if(!r.can_pay)return;
+    box.innerHTML='<button id="payBtn" type="button" style="margin-top:0">💳 Pay online now (Paynow)</button><p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">Pay with EcoCash and other methods on Paynow\'s secure page. Prefer to pay by hand? Use the payment details below.</p><div id="payErr"></div>';
+    $('payBtn').onclick=async()=>{
+      $('payBtn').disabled=true;$('payBtn').textContent='Opening Paynow…';
+      try{
+        const x=await api('pay_link',{return_url:location.href});
+        if(x.paid){loadPay();return}
+        if(x.pay_url&&/^https:\/\//.test(x.pay_url)){location.href=x.pay_url;return}
+        throw new Error('x');
+      }catch(e){$('payBtn').disabled=false;$('payBtn').textContent='💳 Pay online now (Paynow)';$('payErr').innerHTML='<div class="msg err">Online payment is not available right now. Please use the payment details below.</div>'}
+    };
+    if(auto&&['EcoCash','InnBucks'].includes($('fPay').value)){$('payBtn').click()}
+  }catch(e){/* online payment unavailable: manual details still shown */}
+}
+</script></body></html>
