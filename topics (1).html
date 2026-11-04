@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Topic Selection — Delicate & Co</title>
+<meta name="description" content="Choose your research topic for free. Pick your university and programme, then lock in a topic nobody else can take.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+  :root{
+    --ink:#0F1C2E; --ink-soft:#1B2D45; --paper:#F7F4ED; --paper-dim:#EDE8DB;
+    --brass:#C9A24B; --brass-soft:#E2C988; --green:#2D6A4F; --green-soft:#DDEBE3;
+    --red:#8B2E2E; --red-soft:#F3DEDE; --line:rgba(15,28,46,.15); --muted:rgba(15,28,46,.62);
+    --font-display:"Fraunces",Georgia,serif; --font-body:"Inter",-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font-body);background:var(--paper);color:var(--ink);line-height:1.55;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .wrap{max-width:860px;margin:0 auto;padding:0 20px}
+  header{background:var(--ink);color:#fff;padding:14px 0}
+  header .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand{font-family:var(--font-display);font-size:19px;color:#fff;text-decoration:none}
+  .brand span{color:var(--brass)}
+  .back{color:var(--brass-soft);font-size:14px;text-decoration:none;font-weight:600}
+  .hero{padding:44px 0 20px;text-align:center}
+  .eyebrow{display:inline-block;background:var(--brass);color:var(--ink);font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:14px}
+  h1{font-family:var(--font-display);font-size:clamp(28px,5vw,40px);line-height:1.15;margin-bottom:10px}
+  .hero p{color:var(--muted);max-width:560px;margin:0 auto}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:24px;margin:18px 0}
+  .card h2{font-family:var(--font-display);font-size:21px;margin-bottom:4px}
+  .card .sub{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:12.5px;font-weight:700;margin-bottom:5px;letter-spacing:.02em}
+  input,select{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  input:focus,select:focus{outline:2px solid var(--brass);border-color:var(--brass)}
+  select:disabled{background:var(--paper-dim);color:var(--muted)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:8px;border:2px solid var(--ink);background:var(--ink);color:#fff;font:inherit;font-weight:700;cursor:pointer;transition:.15s;text-decoration:none}
+  .btn:hover{background:var(--ink-soft)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-gold{background:var(--brass);border-color:var(--brass);color:var(--ink)}
+  .btn-gold:hover{background:var(--brass-soft)}
+  .btn-ghost{background:transparent;color:var(--ink)}
+  .btn-ghost:hover{background:var(--paper-dim)}
+  .btn-block{width:100%;margin-top:16px}
+  .topic{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;background:#fff}
+  .topic .t{font-weight:600;font-size:15px}
+  .topic.locked{background:#ECECEC;color:#8a8f98;border-style:dashed;filter:grayscale(1)}
+  .topic.locked .t{font-weight:500}
+  .tag{font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;background:var(--paper-dim);color:var(--ink)}
+  .mine{border:2px solid var(--brass);background:#ECECEC;border-radius:10px;padding:18px}
+  .mine .lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280}
+  .mine .title{font-family:var(--font-display);font-size:20px;color:#6b7280;margin:6px 0}
+  .mine .by{font-size:14px;color:#4b5563}
+  .msg{padding:12px 14px;border-radius:8px;font-size:14px;margin:14px 0}
+  .msg.err{background:var(--red-soft);color:var(--red)}
+  .msg.ok{background:var(--green-soft);color:var(--green)}
+  .empty{text-align:center;color:var(--muted);padding:22px 10px}
+  .proposal{border:2px solid var(--brass);background:linear-gradient(135deg,#fffdf7,var(--brass-soft));}
+  .price{font-family:var(--font-display);font-size:44px;line-height:1}
+  .price small{font-family:var(--font-body);font-size:14px;color:var(--muted);font-weight:500}
+  .proposal ul{list-style:none;margin:14px 0;display:grid;gap:7px;font-size:14.5px}
+  .proposal li::before{content:"✓ ";color:var(--green);font-weight:700}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .modal-bg{position:fixed;inset:0;background:rgba(15,28,46,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .modal-bg.open{display:flex}
+  .modal{background:#fff;border-radius:12px;padding:26px;max-width:440px;width:100%}
+  .modal h3{font-family:var(--font-display);font-size:21px;margin-bottom:8px}
+  .modal p{color:var(--muted);font-size:14.5px;margin-bottom:6px}
+  .modal .pick{font-weight:700;color:var(--ink);margin:10px 0 16px}
+  .hidden{display:none!important}
+  body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  input,select{-webkit-user-select:text;user-select:text}
+  body.blurred main,body.blurred header{filter:blur(18px)}
+  #wm{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.5}
+  @media print{body{display:none!important}}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 0 40px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="index.html">Delicate <span>&amp; Co</span></a>
+    <a class="back" href="index.html">← Back to site</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">100% Free</div>
+    <h1>Choose Your Research Topic</h1>
+    <p>Tell us your university, pick your programme, then lock in a topic. Once you choose it, it disappears for everyone else, so nobody can take the same topic as you.</p>
+  </section>
+
+  <!-- STEP 1: DETAILS -->
+  <section class="card" id="detailsCard">
+    <h2>1. Your details</h2>
+    <p class="sub">So we know who the topic belongs to.</p>
+    <form id="detailsForm" autocomplete="on">
+      <div class="grid">
+        <div><label for="fName">Full name</label><input id="fName" required minlength="2" placeholder="e.g. Tendai Moyo" autocomplete="name"></div>
+        <div><label for="fPhone">WhatsApp / phone number</label><input id="fPhone" type="tel" required placeholder="+263 7xx xxx xxx" autocomplete="tel"></div>
+        <div><label for="fUni">University</label><select id="fUni" required><option value="">Select your university…</option><option>UZ</option><option>NUST</option><option>MSU</option><option>ZOU</option><option>BUSE</option><option>CUT</option><option>HIT</option><option>WUA</option><option>Other</option></select></div>
+        <div><label for="fProg">Programme</label><select id="fProg" required disabled><option value="">Loading…</option></select></div>
+      </div>
+      <button class="btn btn-gold btn-block" type="submit" id="showBtn" disabled>Show my topics →</button>
+    </form>
+    <div id="detailsMsg"></div>
+  </section>
+
+  <!-- STEP 2: TOPICS -->
+  <section class="card hidden" id="topicsCard">
+    <h2>2. Pick your topic</h2>
+    <p class="sub" id="topicsSub"></p>
+    <div id="topicsList"></div>
+  </section>
+
+  <!-- YOUR TOPIC (locked) -->
+  <section class="hidden" id="mineWrap">
+    <div class="card" style="padding:0;border:none;background:none;margin-bottom:0">
+      <div class="mine" id="mineBox"></div>
+    </div>
+  </section>
+
+  <!-- RESEARCH PROPOSAL UPSELL -->
+  <section class="card proposal hidden" id="proposalCard">
+    <div class="eyebrow">Research Proposal Service</div>
+    <h2>Want us to write your research proposal?</h2>
+    <p class="sub">Now that you have your topic, let us turn it into a supervisor-ready proposal.</p>
+    <div class="price">$10 <small>per proposal</small></div>
+    <ul>
+      <li>Written on your chosen topic</li>
+      <li>Problem statement, objectives &amp; research questions</li>
+      <li>Literature outline &amp; methodology</li>
+      <li>Proper referencing</li>
+    </ul>
+    <div id="proposalMsg"></div>
+    <div class="btn-row" id="proposalBtns">
+      <button class="btn btn-gold" id="proposalYes">Yes, I want the proposal — $10</button>
+      <button class="btn btn-ghost" id="proposalNo">No thanks, topic only</button>
+    </div>
+  </section>
+</main>
+
+<div id="wm" aria-hidden="true"></div>
+<footer>© Delicate &amp; Co · Free topic selection for university students</footer>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-bg" id="confirmBg" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+  <div class="modal">
+    <h3 id="confirmTitle">Lock in this topic?</h3>
+    <p>Once you choose it, the topic is yours and is removed for everyone else. You can only choose one free topic.</p>
+    <div class="pick" id="confirmTopic"></div>
+    <div class="btn-row">
+      <button class="btn btn-gold" id="confirmYes">Yes, it's mine</button>
+      <button class="btn btn-ghost" id="confirmNo">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://vcektitjggzijnzzcxrm.supabase.co";
+const SUPABASE_KEY = "sb_publishable_KFF1CpZXUu5p6zdVT25m6g_TmbTaUKJ";
+const WHATSAPP = "263780197527";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lsGet = k => { try { return localStorage.getItem(k) || ''; } catch(e){ return ''; } };
+const lsSet = (k,v) => { try { localStorage.setItem(k,v); } catch(e){} };
+
+let combos = [];          // [{university, programme}] of OPEN topics
+let me = { name:'', phone:'', uni:'', prog:'' };
+let pendingId = null;
+
+/* ---------- programmes come from the topics you uploaded ---------- */
+async function loadCombos(){
+  const { data, error } = await sb.from('topics').select('programme');
+  if (error) { $('detailsMsg').innerHTML = '<div class="msg err">Could not load topics' + (error.message ? ' (' + esc(error.message) + ')' : '') + '. <a href="" onclick="location.reload();return false;"><b>Tap to retry</b></a></div>'; return; }
+  combos = data || [];
+  const progs = [...new Set(combos.map(c => c.programme))].sort();
+  const p = $('fProg');
+  if (!progs.length) {
+    p.innerHTML = '<option value="">No topics available right now</option>';
+    $('detailsMsg').innerHTML = '<div class="msg err">All topics are currently taken. Please check back soon, or contact us on WhatsApp.</div>';
+    return;
+  }
+  p.innerHTML = '<option value="">Select your programme…</option>' + progs.map(x => `<option>${esc(x)}</option>`).join('');
+  p.disabled = false;
+  const su = lsGet('dc_uni'), sp = lsGet('dc_prog');
+  if (su) $('fUni').value = su;
+  if (sp && progs.includes(sp)) p.value = sp;
+  updateShowBtn();
+}
+function updateShowBtn(){
+  $('showBtn').disabled = !($('fName').value.trim().length > 1 && $('fPhone').value.replace(/\D/g,'').length >= 7 && $('fUni').value && $('fProg').value);
+}
+['fName','fPhone','fUni','fProg'].forEach(id => { $(id).addEventListener('input', updateShowBtn); $(id).addEventListener('change', updateShowBtn); });
+
+/* ---------- main flow ---------- */
+$('detailsForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  me = { name:$('fName').value.trim(), phone:$('fPhone').value.trim(), uni:$('fUni').value, prog:$('fProg').value };
+  setWatermark();
+  lsSet('dc_name', me.name); lsSet('dc_phone', me.phone); lsSet('dc_uni', me.uni); lsSet('dc_prog', me.prog);
+  await showTopics();
+});
+
+async function getMine(){
+  const { data } = await sb.rpc('my_topic', { p_phone: me.phone });
+  return data || null;
+}
+
+async function showTopics(){
+  $('detailsMsg').innerHTML = '';
+  const mine = await getMine();
+  if (mine) {
+    // client already has a topic: show ONLY their own topic, hide the whole list
+    renderMine(mine);
+    $('topicsCard').classList.add('hidden');
+    $('mineWrap').scrollIntoView({behavior:'smooth', block:'start'});
+    return;
+  }
+  $('mineWrap').classList.add('hidden'); $('proposalCard').classList.add('hidden');
+
+  const { data, error } = await sb.from('topics').select('id,title')
+    .eq('programme', me.prog).order('title');
+  if (error) { $('detailsMsg').innerHTML = '<div class="msg err">Could not load topics' + (error.message ? ' (' + esc(error.message) + ')' : '') + '. Please try again.</div>'; return; }
+
+  $('topicsCard').classList.remove('hidden');
+  $('topicsSub').textContent = `${me.uni} · ${me.prog}`;
+  const list = $('topicsList');
+  if (!data.length) {
+    list.innerHTML = '<div class="empty">No topics left for this programme. Every topic has been taken. Message us on WhatsApp for a custom topic.</div>';
+  } else {
+    list.innerHTML = data.map(t =>
+      `<div class="topic"><span class="t">${esc(t.title)}</span><button class="btn btn-gold" data-id="${t.id}" data-title="${esc(t.title)}">Choose</button></div>`
+    ).join('');
+  }
+  $('topicsCard').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function renderMine(m){
+  $('mineBox').innerHTML = `<div class="lab">🔒 Your topic — locked</div>
+    <div class="title">${esc(m.title)}</div>
+    <div class="by">Chosen by <b>${esc(m.name)}</b> · ${esc(m.university)} · ${esc(m.programme)} · Ref ${esc(m.order_id || '')}</div>
+    <div class="msg ok" style="margin-top:14px;">✅ You have already chosen your free topic.</div>
+    <p style="font-size:13.5px;color:#4b5563;margin-bottom:10px;">Chose it by mistake or changed your mind? You can give it back and pick a different one.</p>
+    <button class="btn btn-ghost" id="giveBackBtn" type="button">↩ Give this topic back &amp; choose another</button>
+    <div id="giveBackMsg"></div>`;
+  $('mineWrap').classList.remove('hidden');
+  $('proposalCard').classList.remove('hidden');
+}
+
+$('topicsList').addEventListener('click', e => {
+  const b = e.target.closest('button[data-id]'); if (!b) return;
+  pendingId = Number(b.dataset.id);
+  $('confirmTopic').textContent = b.dataset.title;
+  $('confirmBg').classList.add('open');
+});
+$('confirmNo').addEventListener('click', () => $('confirmBg').classList.remove('open'));
+
+$('confirmYes').addEventListener('click', async () => {
+  const btn = $('confirmYes'); btn.disabled = true; btn.textContent = 'Locking…';
+  const { data, error } = await sb.rpc('claim_topic', {
+    p_topic: pendingId, p_name: me.name, p_phone: me.phone, p_university: me.uni, p_programme: me.prog
+  });
+  btn.disabled = false; btn.textContent = "Yes, it's mine";
+  $('confirmBg').classList.remove('open');
+  if (error || !data) { $('detailsMsg').innerHTML = '<div class="msg err">Something went wrong. Please try again.</div>'; return; }
+  if (data.ok) {
+    $('detailsMsg').innerHTML = `<div class="msg ok">🎉 Topic secured! Reference <b>${esc(data.order_id)}</b>.</div>`;
+    await showTopics();
+  } else if (data.reason === 'taken') {
+    $('detailsMsg').innerHTML = '<div class="msg err">Sorry, someone just took that topic. Please choose another.</div>';
+    await showTopics();
+  } else if (data.reason === 'already_has') {
+    $('detailsMsg').innerHTML = '<div class="msg err">You already chose a free topic with this number.</div>';
+    await showTopics();
+  } else {
+    $('detailsMsg').innerHTML = '<div class="msg err">Please check your name and phone number.</div>';
+  }
+});
+
+/* ---------- give topic back ---------- */
+$('mineBox').addEventListener('click', async e => {
+  if (!e.target.closest('#giveBackBtn')) return;
+  if (!confirm('Give this topic back? It will return to the list and you can choose a different one.')) return;
+  const btn = $('giveBackBtn'); btn.disabled = true; btn.textContent = 'Giving back…';
+  const { data, error } = await sb.rpc('release_my_topic', { p_phone: me.phone });
+  if (error || !data) { btn.disabled = false; btn.textContent = '↩ Give this topic back & choose another'; $('giveBackMsg').innerHTML = '<div class="msg err">Something went wrong. Please try again.</div>'; return; }
+  if (data.ok) {
+    $('mineWrap').classList.add('hidden'); $('proposalCard').classList.add('hidden');
+    $('proposalBtns').classList.remove('hidden'); $('proposalMsg').innerHTML = '';
+    await loadCombos();
+    $('detailsMsg').innerHTML = '<div class="msg ok">Your topic was given back. Choose a new one below.</div>';
+    await showTopics();
+  } else if (data.reason === 'has_proposal') {
+    btn.disabled = false; btn.textContent = '↩ Give this topic back & choose another';
+    $('giveBackMsg').innerHTML = `<div class="msg err">You already ordered a proposal on this topic, so please WhatsApp us to change it. <a href="https://wa.me/${WHATSAPP}" target="_blank" rel="noopener"><b>Chat now</b></a></div>`;
+  } else {
+    btn.disabled = false; btn.textContent = '↩ Give this topic back & choose another';
+    $('giveBackMsg').innerHTML = '<div class="msg err">We could not find a topic for this number.</div>';
+  }
+});
+
+/* ---------- proposal upsell ---------- */
+$('proposalNo').addEventListener('click', () => {
+  $('proposalBtns').classList.add('hidden');
+  $('proposalMsg').innerHTML = '<div class="msg ok">No problem! Your free topic is saved. If you change your mind, just come back to this page.</div>';
+});
+$('proposalYes').addEventListener('click', async () => {
+  const b = $('proposalYes'); b.disabled = true; b.textContent = 'Adding…';
+  const { data, error } = await sb.rpc('add_proposal', { p_phone: me.phone });
+  if (error || !data || !data.ok) { b.disabled = false; b.textContent = 'Yes, I want the proposal — $10'; $('proposalMsg').innerHTML = '<div class="msg err">Could not add the service. Please try again.</div>'; return; }
+  $('proposalBtns').classList.add('hidden');
+  const mine = $('mineBox').querySelector('.title').textContent;
+  const text = `Hello Delicate & Co, I'm ${me.name} (${me.phone}). I chose the topic "${mine}" and I want the Research Proposal service ($10).`;
+  $('proposalMsg').innerHTML = `<div class="msg ok">✅ Research Proposal ($10) added to your order. Tap below to confirm payment and details on WhatsApp.</div>
+    <a class="btn btn-gold" target="_blank" rel="noopener" href="https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}">Continue on WhatsApp →</a>`;
+});
+
+/* ---------- content protection (deterrents only) ---------- */
+function setWatermark(){
+  const label = (me.name || '') + ' · ' + (me.phone || '');
+  if (!me.name && !me.phone) { $('wm').style.backgroundImage = 'none'; return; }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="320" height="170"><text x="20" y="110" transform="rotate(-24 160 85)" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="rgba(15,28,46,0.16)">${esc(label)}</text></svg>`;
+  $('wm').style.backgroundImage = 'url("data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '")';
+}
+const blurOn = () => document.body.classList.add('blurred');
+const blurOff = () => setTimeout(() => document.body.classList.remove('blurred'), 250);
+['contextmenu','copy','cut','dragstart'].forEach(ev => document.addEventListener(ev, e => {
+  if (!(e.target.closest && e.target.closest('input,select'))) e.preventDefault();
+}));
+document.addEventListener('keydown', e => {
+  const k = (e.key || '').toLowerCase();
+  if (k === 'printscreen') { blurOn(); try { navigator.clipboard.writeText(' '); } catch(_){} setTimeout(blurOff, 1500); }
+  if ((e.ctrlKey || e.metaKey) && ['p','s','u'].includes(k)) e.preventDefault();
+  if (e.metaKey && e.shiftKey && ['3','4','5'].includes(k)) blurOn();
+  if (e.shiftKey && e.metaKey && k === 's') blurOn();
+});
+document.addEventListener('keyup', e => { if ((e.key||'').toLowerCase() === 'printscreen') { try { navigator.clipboard.writeText(' '); } catch(_){} } });
+window.addEventListener('blur', blurOn);
+window.addEventListener('focus', blurOff);
+document.addEventListener('visibilitychange', () => document.hidden ? blurOn() : blurOff());
+
+/* ---------- start ---------- */
+(async function init(){
+  $('fName').value = lsGet('dc_name'); $('fPhone').value = lsGet('dc_phone');
+  await loadCombos();
+  // returning client: show their locked topic automatically
+  if (lsGet('dc_phone')) {
+    me.phone = lsGet('dc_phone'); me.name = lsGet('dc_name');
+    const mine = await getMine();
+    if (mine) { me.uni = mine.university; me.prog = mine.programme; renderMine(mine); setWatermark(); }
+  }
+  updateShowBtn();
+})();
+</script>
+</body>
+</html>
